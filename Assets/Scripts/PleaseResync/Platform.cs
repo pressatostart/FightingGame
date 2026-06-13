@@ -11,7 +11,7 @@ namespace PleaseResync
     internal static class Platform
     {
         private readonly static System.Random RandomNumberGenerator = new System.Random();
-        public enum DebugType{ Log, Warning, Error};
+        public enum DebugType{ Log, Warning, Error };
 
         public static uint GetCurrentTimeMS()
         {
@@ -34,7 +34,8 @@ namespace PleaseResync
         {
             ushort[] newArray = new ushort[(int)Math.Ceiling(byteArray.Length / 2.0)];
             Buffer.BlockCopy(byteArray, 0, newArray, 0, byteArray.Length);
-            return FletcherChecksum(newArray, newArray.Length / 2);
+            //return FletcherChecksum(newArray, newArray.Length / 2);
+            return FletcherChecksum(newArray, newArray.Length);
         }
         //https://en.wikipedia.org/wiki/Fletcher%27s_checksum
         public static uint FletcherChecksum(ushort[] data, int len)
@@ -61,7 +62,8 @@ namespace PleaseResync
             sum2 = (sum2 & 0xffff) + (sum2 >> 16);
             return sum2 << 16 | sum1;
         }
-        public static void UnityLog(string message = "", DebugType type = DebugType.Log)
+
+        public static void Log(string message = "", DebugType type = DebugType.Log)
         {
             switch (type)
             {
@@ -69,7 +71,7 @@ namespace PleaseResync
                     Debug.Log(message);
                     break;
                 case DebugType.Warning:
-                    Debug.LogWarning(message);
+                    Debug.LogWarning($"[color=YELLOW]{message}");
                     break;
                 case DebugType.Error:
                     Debug.LogError(message);

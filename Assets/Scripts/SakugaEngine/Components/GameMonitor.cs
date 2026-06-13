@@ -10,7 +10,7 @@ namespace SakugaEngine
     {
         public FrameTimer DelayTimer;
         [SerializeField] private AudioClip VictoryJingle;
-        public MatchCardsController Cards;
+        //public MatchCardsController Cards;
         public GameObject ResultsScreen;
         [HideInInspector] public int ClockLimit = 99;
         [HideInInspector] public int RoundsToWin = 2;
@@ -57,7 +57,7 @@ namespace SakugaEngine
 
         public void Render()
         {
-            Cards.Render();                
+            //Cards.Render();                
         }
 
         private void SetMatchInitialState(MatchSettings settings)
@@ -113,7 +113,7 @@ namespace SakugaEngine
             CurrentRound++;
 
 
-            if (TimeUp)
+            /*if (TimeUp)
             {
                 Cards.PlayKnockoutAnimation(-1, 3);
             }
@@ -133,7 +133,7 @@ namespace SakugaEngine
                     Cards.PlayKnockoutAnimation(-1, 2);
             }
 
-            DelayTimer.StartTimer(Cards.GetStateDelay());
+            DelayTimer.StartTimer(0Cards.GetStateDelay());*/
             MatchState = MatchState.ROUND_END;
         }
 
@@ -141,7 +141,7 @@ namespace SakugaEngine
         {
             FadeController();
             DelayTimer.Run();
-            Cards.Run();
+            //Cards.Run();
 
             foreach (SakugaActor fighter in _fighters)
             {
@@ -157,16 +157,16 @@ namespace SakugaEngine
                     }
                     if (_fighters[0].StateManager.CurrentState == 0 && _fighters[1].StateManager.CurrentState == 0)
                     {
-                        Cards.PlayCatchPhraseAnimation();
-                        DelayTimer.StartTimer(Cards.GetStateDelay());
+                        //Cards.PlayCatchPhraseAnimation();
+                        //DelayTimer.StartTimer(Cards.GetStateDelay());
                         MatchState = MatchState.CATCHPHRASE;
                     }
                     break;
                 case MatchState.CATCHPHRASE:
                     if (!DelayTimer.IsRunning())
                     {
-                        Cards.PlayRoundStartAnimation(CurrentRound, false);
-                        DelayTimer.StartTimer(Cards.GetStateDelay());
+                        //Cards.PlayRoundStartAnimation(CurrentRound, false);
+                        //DelayTimer.StartTimer(Cards.GetStateDelay());
                         Debug.Log($"Round {CurrentRound + 1}...");
                         MatchState = MatchState.ROUND_START;
                     }
@@ -203,8 +203,8 @@ namespace SakugaEngine
                 case MatchState.ROUND_WINNER:
                     if (!DelayTimer.IsRunning())
                     {
-                        Cards.PlayPlayerWinAnimation(RoundWinner);
-                        DelayTimer.StartTimer(Cards.GetStateDelay());
+                        //Cards.PlayPlayerWinAnimation(RoundWinner);
+                        //DelayTimer.StartTimer(Cards.GetStateDelay());
                         MatchState = MatchState.ROUND_INTERLUDE;
                     }
                     if (AnyButtonPressed())
@@ -280,8 +280,8 @@ namespace SakugaEngine
                 }
                 
                 ResetTimer();
-                Cards.PlayRoundStartAnimation(CurrentRound, false);
-                DelayTimer.StartTimer(Cards.GetStateDelay());
+                //Cards.PlayRoundStartAnimation(CurrentRound, false);
+                //DelayTimer.StartTimer(Cards.GetStateDelay());
                 FadeIn(40);
                 MatchState = MatchState.ROUND_START;
                 Debug.Log($"Round {CurrentRound + 1}...");

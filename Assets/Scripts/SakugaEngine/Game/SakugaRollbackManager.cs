@@ -10,7 +10,7 @@ namespace SakugaEngine.Game
         public void Start()
         {
             GameManager.InputSize = InputSize;
-            //UseLAN = GameManager.Match.SelectedModeSettings.UseLAN;
+            UseLAN = GameManager.Match.SelectedModeSettings.UseLAN;
 
             Debug.Log($"Starting {GameManager.Match.SelectedModeSettings.ModeName} mode.");
 
@@ -22,8 +22,7 @@ namespace SakugaEngine.Game
                         LocalGame(2);
                         break;
                     case Global.NetcodeMode.ONLINE:
-                        //OnlineGame(GameManager.Match.IsSpectator, 2, (uint)GameManager.Match.SpectatorCount, (uint)GameManager.Match.PlayerID);
-                        OnlineGame(2, (uint)GameManager.Match.PlayerID);
+                        OnlineGame(GameManager.Match.IsSpectator, 2, (uint)GameManager.Match.SpectatorCount, (uint)GameManager.Match.PlayerID);
                         break;
                     case Global.NetcodeMode.REPLAY:
                         ReplayMode(2);
@@ -32,11 +31,9 @@ namespace SakugaEngine.Game
             }
         }
 
-        //public override void OnlineGame(bool spectate, uint players, uint spectators, uint ID)
-        public override void OnlineGame(uint maxPlayers, uint ID)
+        public override void OnlineGame(bool spectate, uint players, uint spectators, uint ID)
         {
-            //StartOnlineGame(GameManager, spectate, players, spectators, ID);
-            StartOnlineGame(GameManager, maxPlayers, ID);
+            StartOnlineGame(GameManager, spectate, players, spectators, ID);
         }
 
         public override void LocalGame(uint players)

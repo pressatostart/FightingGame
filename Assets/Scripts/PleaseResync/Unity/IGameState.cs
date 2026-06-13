@@ -37,5 +37,7 @@ namespace PleaseResync
         /// <param name="PlayerID">The selected player's ID</param>
         /// <returns>A byte array to use in the simulation by the specified player</returns>
         byte[] GetLocalInput(int PlayerID, int InputSize);
+
+        void Render();
     }
 }

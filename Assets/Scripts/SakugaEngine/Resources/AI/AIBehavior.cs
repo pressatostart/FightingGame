@@ -3,8 +3,8 @@ using System;
 
 namespace SakugaEngine.Resources
 {
-    [Serializable]
-    public class AIBehavior
+    [CreateAssetMenu(fileName = "New AI Behavior", menuName = "Sakuga Engine/AI Behavior", order = 0)]
+    public class AIBehavior : ScriptableObject
     {
         [Header("Blackboard")]
         /// <summary>

@@ -17,32 +17,41 @@ namespace PleaseResync
         [SerializeField] private TextMeshProUGUI PingInfo;
         [SerializeField] private ConnectionPopUp popUp;
 
-        //protected NewControls controls;
-
+        private bool Spectating;
         private bool Started;
         private bool Replay;
+
+        public bool UseLAN = false;
+        [SerializeField] protected bool UseSeparateThread = false;
         [SerializeField] protected ushort FrameDelay = 2;
         [SerializeField] protected ushort SimulatedFrameDelay = 0;
-        [SerializeField] protected uint InputSize = 2;
-
-        protected uint MaxPlayers = 2;
-        protected uint DeviceCount = 2;
-
+        [SerializeField] protected ushort SpectatorDelay = 30;
+        [SerializeField] public uint MaxPlayers = 2;
+        [SerializeField] public uint MaxSpectators = 8;
+        [SerializeField] protected uint InputSize = 1;
         private uint DEVICE_ID;
+        private uint PingId;
 
-        private string[] Adresses = {"127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"};
-        private ushort[] Ports = {7001, 7002, 7003, 7004};
+        string[] PlayerAddresses = { "127.0.0.1", "127.0.0.1" };
+        string[] SpectatorAddresses = { "127.0.0.1", "127.0.0.1" };
+
+        int[] PlayerPorts = { 7001, 7002 };
+        int[] SpectatorPorts = { 8001, 8002 };
 
         public IGameState sessionState;
 
-        //EOSSessionAdapter adapter;
-        LiteNetLibSessionAdapter adapter;
+        SessionAdapter adapter;
         Session session;
         byte[] LastInput;
         List<SessionAction> sessionActions;
         string InputDebug;
         string SimulationText;
+        string PingText;
+        string RollbackText;
         List<ReplayInputs> RecordedInputs = new List<ReplayInputs>();
+
+        private Thread GameThread;
+        private System.Threading.Mutex mutex = new System.Threading.Mutex();
 
         public void SetSyncTest(bool toggle)
         {
@@ -71,7 +80,6 @@ namespace PleaseResync
 
             //controls = new NewControls();
         }
-
         public void OnEnable()
         {
             //controls.Enable();
@@ -87,143 +95,233 @@ namespace PleaseResync
         {
             if (!Started) return;
 
+            if (!UseSeparateThread) GameLoop();
+            mutex.WaitOne();
+            sessionState.Render();
+            mutex.ReleaseMutex();
+
             if (SimulationInfo != null) SimulationInfo.text = NotificationText();
-
-            if (!session.IsOffline())
-            {
-                session.Poll();
-
-                PopUpUpdate();
-
-                if (!session.IsRunning()) return;
-
-                if (RollbackInfo != null) RollbackInfo.text = "RBF: " + session.RollbackFrames();
-                if (PingInfo != null) PingInfo.text = "Ping: " + ShowPingInfo() + " ms";
-            }
-
-            GameLoop();
+            if (RollbackInfo != null) RollbackInfo.text = RollbackText;
+            if (PingInfo != null) PingInfo.text = PingText;
         }
 
-        public void CreateConnections(string[] IPAdresses, ushort[] ports)
+        void OnDestroy()
+        {
+            CloseGame();
+        }
+
+        public void CreatePlayerConnections(string[] IPAdresses, ushort[] ports)
         {
             for (uint i = 0; i < IPAdresses.Length; i++)
             {
-                if (IPAdresses[i] != "") Adresses[i] = IPAdresses[i];
-                if (ports[i] > 0) Ports[i] = ports[i];
+                if (IPAdresses[i] != "") PlayerAddresses[i] = IPAdresses[i];
+                if (ports[i] > 0) PlayerPorts[i] = ports[i];
+            }
+        }
+        
+        public void CreateSpectatorConnections(string[] IPAdresses, ushort[] ports)
+        {
+            for (uint i = 0; i < IPAdresses.Length; i++)
+            {
+                if (IPAdresses[i] != "") SpectatorAddresses[i] = IPAdresses[i];
+                if (ports[i] > 0) SpectatorPorts[i] = ports[i];
             }
         }
 
-        protected void StartOnlineGame(IGameState state, uint playerCount, uint ID)
+        protected void StartOnlineGame(IGameState state, bool spectate, uint playerCount, uint spectatorCount, uint ID)
         {
             DEVICE_ID = ID;
-            MaxPlayers = playerCount;
-            DeviceCount = playerCount;
-
             sessionState = state;
             sessionState.Setup();
-            //adapter = new EOSSessionAdapter(EOSSDKComponent.Instance.GetMatchId((int)DEVICE_ID));
-            adapter = new LiteNetLibSessionAdapter(Adresses[DEVICE_ID], Ports[DEVICE_ID]);
-           
-            session = new Peer2PeerSession(InputSize, DeviceCount, MaxPlayers, false, adapter);
             LastInput = new byte[InputSize];
-            session.SetLocalDevice(DEVICE_ID, 1, FrameDelay);
-            Debug.Log($"Local device {DEVICE_ID} created");
-            
-            for (uint i = 0; i < DeviceCount; i++)
+
+            //if (UseLAN)
+            adapter = new LiteNetLibSessionAdapter(PlayerAddresses[DEVICE_ID], (ushort)PlayerPorts[DEVICE_ID]);
+            //else
+                //adapter = new EOSSessionAdapter();
+
+            if (!spectate)
             {
-                if (i != DEVICE_ID)
+                session = new Peer2PeerSession(InputSize, playerCount, MaxPlayers, false, adapter);
+                session.SetLocalDevice(DEVICE_ID, 1, FrameDelay);
+
+                for (uint i = 0; i < playerCount; i++)
                 {
-                    //session.AddRemoteDevice(i, 1, EOSSDKComponent.Instance.GetMatchId((int)i));
-                    session.AddRemoteDevice(i, 1, LiteNetLibSessionAdapter.CreateRemoteConfig(Adresses[i], Ports[i]));
-                    Debug.Log($"Device {i} created");
+                    if (i != DEVICE_ID)
+                    {
+                        //if (UseLAN)
+                        session.AddRemoteDevice(i, 1, LiteNetLibSessionAdapter.CreateRemoteConfig(PlayerAddresses[i], (ushort)PlayerPorts[i]));
+                        //else
+                            //session.AddRemoteDevice(i, 1, EOSManager.Instance.PlayerIds[i]);
+                        PingId = i;
+
+                        Debug.Log($"Device {i} created");
+                    }
+                }
+                // Add spectators
+                if (DEVICE_ID < playerCount)
+                {
+                    for (uint i = 0; i < spectatorCount; i++)
+                    {
+                        //if (UseLAN)
+                        //{
+                        if (i % playerCount != DEVICE_ID) continue;
+                        session.AddSpectatorDevice(LiteNetLibSessionAdapter.CreateRemoteConfig(SpectatorAddresses[i], (ushort)SpectatorPorts[i]));
+                        //}
+                        //else
+                        //{
+                            //if (EOSManager.Instance.SpectatorIds[i] == null) continue;
+                            //session.AddSpectatorDevice(EOSManager.Instance.SpectatorIds[i]);
+                        //}
+                    }
                 }
             }
-            
+            else
+            {
+                // Let's spectate!
+                session = new SpectatorSession(InputSize, playerCount, adapter, SpectatorDelay);
+                // be sure to pass ALL the players as in player count
+                uint targetDevice = DEVICE_ID % playerCount;
+                //if (UseLAN)
+                session.AddRemoteDevice(targetDevice, playerCount, LiteNetLibSessionAdapter.CreateRemoteConfig(PlayerAddresses[targetDevice], (ushort)PlayerPorts[targetDevice]));
+                //else
+                    //session.AddRemoteDevice(targetDevice, playerCount, EOSManager.Instance.PlayerIds[targetDevice]);
+                Debug.Log($"Spectator device id {DEVICE_ID} connected to player ID {targetDevice}");
+            }
+
+            Spectating = spectate;
             Replay = false;
             Started = true;
+
+            StartGameThread();
         }
 
         protected void StartOfflineGame(IGameState state, uint playerCount)
         {
-            DEVICE_ID = 0;
-            MaxPlayers = playerCount;
-
             sessionState = state;
             sessionState.Setup();
-
-            session = new Peer2PeerSession(InputSize, 1, MaxPlayers, true, null);
-            LastInput = new byte[(int)(MaxPlayers * InputSize)];
-            session.SetLocalDevice(DEVICE_ID, MaxPlayers, SimulatedFrameDelay);
+            session = new Peer2PeerSession(InputSize, 1, playerCount, true, null);
+            LastInput = new byte[(int)(playerCount * InputSize)];
+            session.SetLocalDevice(0, playerCount, SimulatedFrameDelay);
 
             if (RollbackInfo != null) RollbackInfo.text = "";
             if (PingInfo != null) PingInfo.text = "";
 
+            Spectating = false;
             Replay = false;
             Started = true;
+
+            StartGameThread();
         }
 
         protected void StartReplay(IGameState state, uint playerCount)
         {
-            DEVICE_ID = 0;
-            MaxPlayers = playerCount;
-
             sessionState = state;
             sessionState.Setup();
-
-            session = new Peer2PeerSession(InputSize, 1, MaxPlayers, true, null);
-            LastInput = new byte[(int)(MaxPlayers * InputSize)];
-            session.SetLocalDevice(DEVICE_ID, MaxPlayers, 0);
+            session = new Peer2PeerSession(InputSize, 1, playerCount, true, null);
+            LastInput = new byte[(int)(playerCount * InputSize)];
+            session.SetLocalDevice(0, playerCount, SimulatedFrameDelay);
 
             if (RollbackInfo != null) RollbackInfo.text = "";
             if (PingInfo != null) PingInfo.text = "";
 
+            Spectating = false;
             Replay = true;
             Started = true;
+
+            StartGameThread();
+        }
+
+        private void GameThreadLoop()
+        {
+            long threadStartTime;
+            long threadEndTime;
+            while (Started)
+            {
+                threadStartTime = Platform.GetCurrentTimeMS();
+                mutex.WaitOne();
+                GameLoop();
+                mutex.ReleaseMutex();
+                threadEndTime = Platform.GetCurrentTimeMS();
+                int sleepTime = (int)((1 / 60f) * 1000);
+                int threadTime = (int)(threadEndTime - threadStartTime);
+                //GD.Print(threadEndTime - threadStartTime);
+                Thread.Sleep(Math.Max(sleepTime - threadTime, 0));
+            }
         }
 
         private void GameLoop()
         {
-            if (Replay)
-                LastInput = ReadInputs(session.Frame());
-            else
-                for (int i = 0; i < LastInput.Length / InputSize; i++)
-                {
-                    byte[] inputs = SyncTest ? GetRandomInput() : sessionState.GetLocalInput(i, (int)InputSize);
-                    Array.Copy(inputs, 0, LastInput, i * InputSize, inputs.Length);
-                }
+            if (!session.IsOffline()) session.Poll();
 
-            sessionActions = session.AdvanceFrame(LastInput);
-            
-            foreach (var action in sessionActions)
+            if (session.IsRunning())
             {
-                switch (action)
+                if (Replay)
+                    LastInput = ReadInputs(session.Frame());
+                else
+                    for (int i = 0; i < LastInput.Length / InputSize; i++)
+                    {
+                        byte[] inputs = SyncTest ? GetRandomInput() : sessionState.GetLocalInput(i, (int)InputSize);
+                        Array.Copy(inputs, 0, LastInput, i * InputSize, inputs.Length);
+                    }
+
+                sessionActions = session.AdvanceFrame(LastInput);
+
+                foreach (var action in sessionActions)
                 {
-                    case SessionAdvanceFrameAction AFAction:
-                        InputDebug = InputConstructor(AFAction.Inputs);
-                        sessionState.GameLoop(AFAction.Inputs);
-                        if (!Replay) RecordInput(AFAction.Frame, AFAction.Inputs);
-                        break;
-                    case SessionLoadGameAction LGAction:
-                        sessionState.LoadState(LGAction.Load());
-                        break;
-                    case SessionSaveGameAction SGAction:
-                        byte[] state = sessionState.SaveState();
-                        SGAction.Save(state, Platform.GetChecksum(state));
-                        break;
+                    switch (action)
+                    {
+                        case SessionAdvanceFrameAction AFAction:
+                            InputDebug = InputConstructor(AFAction.Inputs);
+                            sessionState.GameLoop(AFAction.Inputs);
+                            if (!Replay) RecordInput(AFAction.Frame, AFAction.Inputs);
+                            break;
+                        case SessionLoadGameAction LGAction:
+                            sessionState.LoadState(LGAction.Load());
+                            break;
+                        case SessionSaveGameAction SGAction:
+                            byte[] state = sessionState.SaveState();
+                            SGAction.Save(state, Platform.GetChecksum(state));
+                            break;
+                    }
                 }
+
+                if (Spectating)
+                {
+                    SimulationText = $"Spectating...";
+                    RollbackText = "";
+                    PingText = "";
+                }
+                else
+                {
+                    string FrameCounter = session.IsOffline() ? $"{session.Frame()}" : $"{session.Frame()} ({session.RemoteFrame()} | {session.FrameAdvantage()} | {session.RemoteFrameAdvantage()})";
+
+                    SimulationText = FrameCounter + $" || ( {InputDebug} )";
+                    if (!session.IsOffline())
+                    {
+                        RollbackText = "RBF: " + session.AverageRollbackFrames();
+                        PingText = "Ping: " + ShowPingInfo() + " ms";
+                    }
+                }
+
+                if (Replay && session.Frame() >= RecordedInputs.Count)
+                    CloseGame();
             }
+        }
 
-            string FrameCounter = session.IsOffline() ? $"{session.Frame()}" : $"{session.Frame()} ({session.FrameAdvantage()})";
+        private void StartGameThread()
+        {
+            if (!UseSeparateThread) return;
 
-            SimulationText = FrameCounter + $" || ( {InputDebug} )";
-
-            if (Replay && session.Frame() >= RecordedInputs.Count)
-                CloseGame();
+            GameThread = new Thread(() => GameThreadLoop());
+            GameThread.IsBackground = true;
+            GameThread.Start();
         }
 
         private string NotificationText()
         {
-            Debug.Log("Running");
+            if (Spectating) return SimulationText;
+
             switch (session.State())
             {
                 default:
@@ -238,7 +336,6 @@ namespace PleaseResync
                     return "Fatal desync detected.";
             }
         }
-
         private void PopUpUpdate()
         {
             switch (session.State())
@@ -262,10 +359,11 @@ namespace PleaseResync
 
         public void CloseGame()
         {
+            Spectating = false;
+            Started = false;
+            Replay = false;
             sessionState = null;
             if (adapter != null) adapter.Close();
-            Replay = false;
-            Started = false;
             SimulationInfo.text = "Disconnected";
         }
 
@@ -288,7 +386,6 @@ namespace PleaseResync
                 RecordedInputs.Add(new ReplayInputs());
             
             RecordedInputs[frame] = new ReplayInputs(inputs);
-            
         }
 
         private byte[] ReadInputs(int frame)
@@ -307,9 +404,9 @@ namespace PleaseResync
             return cnv;
         }
 
-        public virtual void OnlineGame(uint maxPlayers, uint ID){}
-        public virtual void LocalGame(uint maxPlayers){}
-        public virtual void ReplayMode(uint maxPlayers) {}
+        public virtual void OnlineGame(bool spectate, uint players, uint spectators, uint ID) {}
+        public virtual void LocalGame(uint players) {}
+        public virtual void ReplayMode(uint players) {}
     }
 
     public struct ReplayInputs

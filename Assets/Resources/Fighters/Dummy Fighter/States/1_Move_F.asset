@@ -13,30 +13,32 @@ MonoBehaviour:
   m_Name: 1_Move_F
   m_EditorClassIdentifier: 
   StateName: Move Forward
+  AnimationData: {fileID: 11400000, guid: 38ff4894a60d68f47807a8d21af0357f, type: 2}
+  BaseStance: 0
   Type: 1
-  OffTheGround: 0
-  Duration: 32
-  Loop: 1
-  LoopFrames: {x: 0, y: 31}
-  TurnState: -1
-  HitStunFrameLimit: -1
-  stateProperties: []
-  statePhysics:
-  - Frame: 0
-    UseLateralSpeed: 1
-    LateralSpeed: 30000
-    UseVerticalSpeed: 1
-    VerticalSpeed: 0
-    UseGravity: 1
-    Gravity: 0
-    UseLateralInertia: 0
-    UseVerticalInertia: 0
-    UseHorizontalInput: 0
-    UseVerticalInput: 0
-  hitboxStates:
-  - animationStage: 0
-    Frame: 0
-    HitboxIndex: 0
-  animationEvents: []
-  throwPivot: []
-  stateTransitions: []
+  AIFlags: 0
+  TransitionEvents: []
+  OnEnterEvents: []
+  OnTickEvents:
+  - Conditions: []
+    Actions:
+    - rid: 3868481344676298763
+    - rid: 3868481344676298764
+  OnExitEvents: []
+  OnHitConfirmEvents: []
+  OnHitReactionEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 3868481344676298763
+      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 22000
+        UseInertia: 0
+        UseInput: 0
+    - rid: 3868481344676298764
+      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0

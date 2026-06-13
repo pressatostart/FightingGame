@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dbeec796fd86df4e80b53435612cf13, type: 3}
   m_Name: Debug Mode
   m_EditorClassIdentifier: 
-  ModeName: Febug Mode
+  ModeName: Debug Mode
   AutoStart: 0
   NetcodeMode: 0
   PauseMode: 0
   UseLAN: 1
   CanKO: 1
   AutoFillResources: 0
-  ShowMatchIntro: 1
-  ShowMatchCards: 1
+  ShowMatchIntro: 0
+  ShowMatchCards: 0
   ShowTrainingInfo: 0
   ShowOnlineInfo: 0
   AllowShowHitboxes: 1

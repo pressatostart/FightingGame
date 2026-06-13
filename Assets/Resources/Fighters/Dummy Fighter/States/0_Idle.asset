@@ -13,13 +13,32 @@ MonoBehaviour:
   m_Name: 0_Idle
   m_EditorClassIdentifier: 
   StateName: Idle
-  AnimationData: {fileID: 0}
+  AnimationData: {fileID: 11400000, guid: 38ff4894a60d68f47807a8d21af0357f, type: 2}
   BaseStance: 0
   Type: 1
   AIFlags: 0
   TransitionEvents: []
   OnEnterEvents: []
-  OnTickEvents: []
+  OnTickEvents:
+  - Conditions: []
+    Actions:
+    - rid: 3868481344676298765
+    - rid: 3868481344676298766
   OnExitEvents: []
   OnHitConfirmEvents: []
   OnHitReactionEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 3868481344676298765
+      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0
+    - rid: 3868481344676298766
+      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0

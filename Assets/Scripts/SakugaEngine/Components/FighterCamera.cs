@@ -76,7 +76,7 @@ namespace SakugaEngine
             mainCam.transform.position = new Vector3(
                 Mathf.Clamp(Mathf.Lerp(mainCam.transform.position.x, newCamPosition.x, DELTA), -_wallLimit + BoundsAdd, _wallLimit - BoundsAdd),
                 Mathf.Clamp(Mathf.Lerp(mainCam.transform.position.y, newCamPosition.y, DELTA), _groundLimit + FinalYOffset, _ceilingLimit - FinalYOffset),
-                -FinalZOffset);
+                FinalZOffset);
             
             if (charCam != null)
             {

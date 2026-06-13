@@ -1,3 +1,4 @@
+using UnityEngine;
 using System;
 
 namespace SakugaEngine.Resources
@@ -5,8 +6,11 @@ namespace SakugaEngine.Resources
     [Serializable]
     public class FrameDataEvent
     {
-        public FrameDataCondition[] Conditions;
-        public FrameDataAction[] Actions;
+        [SerializeReference, SubclassSelector]
+        public FrameDataCondition[] Conditions = Array.Empty<FrameDataCondition>();
+
+        [SerializeReference, SubclassSelector]
+        public FrameDataAction[] Actions = Array.Empty<FrameDataAction>();
 
         public void RunEvent(ref SakugaActor Actor)
         {

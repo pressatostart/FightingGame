@@ -496,8 +496,8 @@ namespace SakugaEngine.GameState
             MatchState = reference.MatchState;
             CurrentRound = reference.CurrentRound;
             RoundWinner = reference.RoundWinner;
-            CardsCurrentAnimation = reference.Cards.CurrentAnimation;
-            CardsCurrentFrame = reference.Cards.Frame;
+            //CardsCurrentAnimation = reference.Cards.CurrentAnimation;
+            //CardsCurrentFrame = reference.Cards.Frame;
 
             VictoryCounter = reference.VictoryCounter;
         }
@@ -519,8 +519,8 @@ namespace SakugaEngine.GameState
             reference.MatchState = MatchState;
             reference.CurrentRound = CurrentRound;
             reference.RoundWinner = RoundWinner;
-            reference.Cards.CurrentAnimation = CardsCurrentAnimation;
-            reference.Cards.Frame = CardsCurrentFrame;
+            //reference.Cards.CurrentAnimation = CardsCurrentAnimation;
+            //reference.Cards.Frame = CardsCurrentFrame;
             
             reference.VictoryCounter = VictoryCounter;
         }

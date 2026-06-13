@@ -15,17 +15,17 @@ MonoBehaviour:
   GameModes:
   - {fileID: 11400000, guid: 7a6ea93ff1194a941ae3cbf58c3b516e, type: 2}
   SelectedMode: 0
-  TimeLimit: -1
+  TimeLimit: 99
   RoundsToWin: 2
   SelectedStage: 0
   SelectedBGM: 0
   Difficulty: 2
   P1SelectedCharacter: 0
   P1SelectedColor: 0
-  P1SelectedDevice: -1
+  P1SelectedDevice: 0
   P2SelectedCharacter: 0
   P2SelectedColor: 0
-  P2SelectedDevice: -1
+  P2SelectedDevice: 1
   OnlineP1Name: 
   OnlineP1PlatformIcon: {fileID: 0}
   OnlineP2Name: 

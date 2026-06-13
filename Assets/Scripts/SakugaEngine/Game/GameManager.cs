@@ -113,7 +113,7 @@ namespace SakugaEngine.Game
             RenderNodes();
             Camera.UpdateCamera(Fighters[0], Fighters[1]);
             if (healthHUD != null) healthHUD.UpdateHealthBars(Fighters, Monitor);
-            if (healthHUD != null) healthHUD.UpdateHitNotifications(Notifs);
+            //if (healthHUD != null) healthHUD.UpdateHitNotifications(Notifs);
             if (metersHUD != null) metersHUD.UpdateMeters(Fighters);
             Curtain.FadeIntensity = Monitor.FadeScreenIntensity;
             Monitor.Render();
@@ -196,7 +196,7 @@ namespace SakugaEngine.Game
             healthHUD.Setup(Fighters);
             metersHUD.Setup(Fighters);
             
-            AudioManager.Instance.PlayBGM(songsList.elements[Match.SelectedBGM].clip);
+            //AudioManager.Instance.PlayBGM(songsList.elements[Match.SelectedBGM].clip);
         }
 
         public void CreateFighter(int characterIndex, int playerIndex)
@@ -231,7 +231,7 @@ namespace SakugaEngine.Game
 
         public void CreateStage(int stageIndex)
         {
-            GameObject temp = Instantiate(stagesList.elements[stageIndex].Instance, transform);
+            //Instantiate(stagesList.elements[stageIndex].Instance, transform);
             //AddChild(temp);
         }
 

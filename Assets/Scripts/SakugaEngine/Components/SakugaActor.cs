@@ -23,8 +23,8 @@ namespace SakugaEngine
         public FrameProperties InitialProperties;
         public HitChecker AllowHit;
 		[Header("Visuals")]
-        private AnimationViewer Animator;
-        protected Transform[] Graphics;
+        [SerializeField] private AnimationViewer Animator;
+        [SerializeField] protected Transform[] Graphics;
         [Header("Resources")]
         public DataContainer Data;
         public SpawnsList SpawnablesList;
