@@ -20,11 +20,11 @@ namespace SakugaEngine
         private int currentCommand = 0;
         private int currentInputIndex = 0;
         private int currentDecisionRate;
-        public bool canAdvance;
-        public bool inputFinished = true;
-        public bool blocking;
-        public bool teching;
-        public HitType proximityHit;
+        [HideInInspector] public bool canAdvance;
+        [HideInInspector] public bool inputFinished = true;
+        [HideInInspector] public bool blocking;
+        [HideInInspector] public bool teching;
+        [HideInInspector] public HitType proximityHit;
 
         private AIData data => _owner.Data._aiData;
 

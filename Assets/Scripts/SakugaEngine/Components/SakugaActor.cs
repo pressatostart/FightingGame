@@ -11,7 +11,7 @@ namespace SakugaEngine
 {
 	public partial class SakugaActor : SakugaNode, IDamage
     {
-        public InputManager Inputs;
+        [HideInInspector] public InputManager Inputs;
 		[Header("Components")]
 		public PhysicsBody Body;
 		public SakugaParameters Parameters;

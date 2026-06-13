@@ -3,7 +3,7 @@ using System;
 
 namespace SakugaEngine.Resources
 {    
-    [CreateAssetMenu(fileName = "New Match Settings", menuName = "Sakuga Engine/New Match Settings", order = 0)]
+    [CreateAssetMenu(fileName = "New Match Settings", menuName = "Sakuga Engine/Match Settings", order = 0)]
     public class MatchSettings : ScriptableObject
     {
         [Header("Main Settings")]

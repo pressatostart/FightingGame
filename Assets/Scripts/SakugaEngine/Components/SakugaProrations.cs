@@ -6,22 +6,22 @@ namespace SakugaEngine
 {
     public partial class SakugaProrations : MonoBehaviour
     {
-        public ushort BaseAttack;
-        public ushort BaseDefense;
+        [HideInInspector] public ushort BaseAttack;
+        [HideInInspector] public ushort BaseDefense;
 
-        public ushort CurrentAttack;
-        public ushort CurrentDefense;
+        [HideInInspector] public ushort CurrentAttack;
+        [HideInInspector] public ushort CurrentDefense;
 
-        public ushort CurrentDamageScaling;
-        public ushort CurrentBaseDamageScaling;
-        public ushort CurrentCornerDamageScaling;
+        [HideInInspector] public ushort CurrentDamageScaling;
+        [HideInInspector] public ushort CurrentBaseDamageScaling;
+        [HideInInspector] public ushort CurrentCornerDamageScaling;
 
-        public ushort CurrentSameMoveProration;
-        public ushort CurrentGravityProration;
-        public ushort CurrentHitstunProration;
+        [HideInInspector] public ushort CurrentSameMoveProration;
+        [HideInInspector] public ushort CurrentGravityProration;
+        [HideInInspector] public ushort CurrentHitstunProration;
 
-        public byte GravityDecayFactor = 0;
-        public byte HitstunDecayFactor = 0;
+        [HideInInspector] public byte GravityDecayFactor = 0;
+        [HideInInspector] public byte HitstunDecayFactor = 0;
 
         public ushort SelectDamageScaling(bool condition) => condition ? CurrentCornerDamageScaling : CurrentBaseDamageScaling;
 

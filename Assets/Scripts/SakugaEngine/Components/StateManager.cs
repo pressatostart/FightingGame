@@ -9,8 +9,8 @@ namespace SakugaEngine
     {
         private SakugaActor _owner;
 
-        public int CurrentState;
-        public int CurrentStateFrame;
+        [HideInInspector] public int CurrentState;
+        [HideInInspector] public int CurrentStateFrame;
 
         public void Initialize(SakugaActor owner)
         {

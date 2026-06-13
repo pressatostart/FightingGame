@@ -1,9 +1,11 @@
 using UnityEngine;
 using SakugaEngine.Resources;
 using SakugaEngine.Global;
+using System;
 
 namespace SakugaEngine
 {
+    [Serializable]
     public class InputManager
     {
         public InputRegistry[] InputHistory;

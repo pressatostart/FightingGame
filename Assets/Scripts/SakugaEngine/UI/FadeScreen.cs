@@ -4,6 +4,7 @@ using System;
 
 namespace SakugaEngine.UI
 {
+    [ExecuteInEditMode]
     public partial class FadeScreen : MonoBehaviour
     {
         [Range(0, 100)] public int FadeIntensity;

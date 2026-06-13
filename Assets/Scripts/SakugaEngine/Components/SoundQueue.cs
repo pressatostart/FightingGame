@@ -11,6 +11,11 @@ namespace SakugaEngine
         private ushort QueueTimer = 0;
         private AudioClip BufferedSound;
 
+        public void Awake()
+        {
+            Source = GetComponent<AudioSource>();
+        } 
+
         public void FixedUpdate()
         {
             TickQueueTimer();

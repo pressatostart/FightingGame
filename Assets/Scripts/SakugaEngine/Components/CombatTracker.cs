@@ -5,17 +5,17 @@ namespace SakugaEngine
     public partial class CombatTracker : MonoBehaviour
     {
         private SakugaActor _owner;
-        public int HitCombo;
-        public int LastDamage;
-        public int CurrentCombo;
-        public int HighestCombo;
-        public int TotalFrames;
-        public int FrameData;
-        public int FrameAdvantage;
-        public int HitFrame;
-        public int StunAtHit;
-        public int LastHitType;
-        public bool invalidHit;
+        [HideInInspector] public int HitCombo;
+        [HideInInspector] public int LastDamage;
+        [HideInInspector] public int CurrentCombo;
+        [HideInInspector] public int HighestCombo;
+        [HideInInspector] public int TotalFrames;
+        [HideInInspector] public int FrameData;
+        [HideInInspector] public int FrameAdvantage;
+        [HideInInspector] public int HitFrame;
+        [HideInInspector] public int StunAtHit;
+        [HideInInspector] public int LastHitType;
+        [HideInInspector] public bool invalidHit;
 
         public void Initialize(SakugaActor onwer)
         {

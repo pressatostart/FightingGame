@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dbeec796fd86df4e80b53435612cf13, type: 3}
+  m_Name: Debug Mode
+  m_EditorClassIdentifier: 
+  ModeName: Febug Mode
+  AutoStart: 0
+  NetcodeMode: 0
+  PauseMode: 0
+  UseLAN: 1
+  CanKO: 1
+  AutoFillResources: 0
+  ShowMatchIntro: 1
+  ShowMatchCards: 1
+  ShowTrainingInfo: 0
+  ShowOnlineInfo: 0
+  AllowShowHitboxes: 1
+  AllowShowInputs: 0
+  AllowShowDebugElements: 1
+  AllowUseDebugCommands: 1
+  NoAI: 1
+  ReturnToScene: 
