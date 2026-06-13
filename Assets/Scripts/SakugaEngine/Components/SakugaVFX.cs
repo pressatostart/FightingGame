@@ -1,69 +1,92 @@
 using UnityEngine;
-using System.IO;
+using SakugaEngine.GameState;
+using SakugaEngine.Global;
+using MessagePack;
 
 namespace SakugaEngine
 {
-    public partial class SakugaVFX : MonoBehaviour
+    public partial class SakugaVFX : SakugaNode
     {
+        private SakugaActor _master;
         [Header("Settings")]
         [SerializeField] private int Duration;
         [SerializeField] private Animator Player;
         [SerializeField] private Transform Graphics;
         [SerializeField] private string AnimationName;
         [SerializeField] private SoundQueue Sound;
-        [HideInInspector] public bool IsActive;
+        [HideInInspector] public bool AttachedToOwner;
         [HideInInspector] public Vector2Int FixedPosition;
         [HideInInspector] public int Frame;
         [HideInInspector] public int Side;
 
-        public void Update()
+        SakugaVFX actor;
+        private SakugaVFXState State;
+
+        public void SetMaster(SakugaActor newMaster) => _master = newMaster;
+        public SakugaActor GetMaster() => _master;
+
+        public override void Render()
         {
-            transform.position = Global.ToScaledVector3(FixedPosition);
-            Graphics.localScale = new Vector3(Side, 1, 1);
             Graphics.gameObject.SetActive(IsActive);
-            Player.Play(AnimationName, 0, Frame / (float)Duration);
+            Vector2Int pos = FixedPosition;
+            if (AttachedToOwner) pos = _master.Body.FixedPosition + new Vector2Int(FixedPosition.x, FixedPosition.y);
+            Graphics.position = GlobalFunctions.ToScaledVector3(pos);
+            Graphics.rotation = Quaternion.identity;
+            Graphics.localScale = new Vector3(Side, 1, 1);
+            Player.PlayInFixedTime(AnimationName, 0, (Duration - Frame) / (float)GlobalVariables.TicksPerSecond);
         }
-        
-        public void Initialize()
+
+        public override void Initialize(uint id)
         {
+            base.Initialize(id);
+            actor = this;
             FixedPosition = Vector2Int.zero;
             Side = 0;
             Frame = -1;
-            IsActive = false;
         }
-        public void Spawn(Vector2Int origin, int side)
+
+        public void Reset()
         {
+            IsActive = StartActive;
+            FixedPosition = Vector2Int.zero;
+            Side = 0;
+            Frame = -1;
+        }
+
+        public void Spawn(Vector2Int origin, int side, bool attached)
+        {
+            AttachedToOwner = attached;
             FixedPosition = origin;
             Side = side;
-            Frame = -1;
-            //Sound.Stop();
-            Sound.SimpleQueueSound();
+            Frame = Duration;
+            if (AttachedToOwner)
+            {
+                FixedPosition -= new Vector2Int(_master.Body.FixedPosition.x, _master.Body.FixedPosition.y);
+            } 
+            if (Sound != null)
+            {
+                Sound.SimpleQueueSound();
+            }
             IsActive = true;
         }
-        public void Tick()
+
+        public override void LateTick()
         {
             if (!IsActive) return;
 
-            Frame++;
-            if (Frame >= Duration - 1) IsActive = false;
+            Frame--;
+            if (Frame < 0) { IsActive = false;  return; }
         }
 
-        public void Serialize(BinaryWriter bw)
+        public override byte[] GetStateData()
         {
-            bw.Write(FixedPosition.x);
-            bw.Write(FixedPosition.y);
-            bw.Write(IsActive);
-            bw.Write(Frame);
-            bw.Write(Side);
+            State.GetStateData(ref actor);
+            return MessagePackSerializer.Serialize(State);
         }
-
-        public void Deserialize(BinaryReader br)
+		public override void SetStateData(byte[] stateBuffer)
         {
-            FixedPosition.x = br.ReadInt32();
-            FixedPosition.y = br.ReadInt32();
-            IsActive = br.ReadBoolean();
-            Frame = br.ReadInt32();
-            Side = br.ReadInt32();
+            State = MessagePackSerializer.Deserialize<SakugaVFXState>(stateBuffer);
+            State.SetStateData(ref actor);
         }
     }
 }

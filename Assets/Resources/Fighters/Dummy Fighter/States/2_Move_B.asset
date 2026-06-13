@@ -12,31 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e1def9eae527dd4994a3e296dcb49f3, type: 3}
   m_Name: 2_Move_B
   m_EditorClassIdentifier: 
-  StateName: 
+  StateName: Move Back
+  AnimationData: {fileID: 0}
+  BaseStance: 0
   Type: 1
-  OffTheGround: 0
-  Duration: 32
-  Loop: 1
-  LoopFrames: {x: 0, y: 31}
-  TurnState: -1
-  HitStunFrameLimit: -1
-  stateProperties: []
-  statePhysics:
-  - Frame: 0
-    UseLateralSpeed: 1
-    LateralSpeed: -22000
-    UseVerticalSpeed: 1
-    VerticalSpeed: 0
-    UseGravity: 1
-    Gravity: 0
-    UseLateralInertia: 0
-    UseVerticalInertia: 0
-    UseHorizontalInput: 0
-    UseVerticalInput: 0
-  hitboxStates:
-  - animationStage: 0
-    Frame: 0
-    HitboxIndex: 0
-  animationEvents: []
-  throwPivot: []
-  stateTransitions: []
+  AIFlags: 0
+  TransitionEvents: []
+  OnEnterEvents: []
+  OnTickEvents: []
+  OnExitEvents: []
+  OnHitConfirmEvents: []
+  OnHitReactionEvents: []

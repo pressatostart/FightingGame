@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ValidInputs:
   - Inputs:
-    - Directional: 4
+    - Directional: 2
       Buttons: 0
       DirectionalMode: 1
       ButtonMode: 0

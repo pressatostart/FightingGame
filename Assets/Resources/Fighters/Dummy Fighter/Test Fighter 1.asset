@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e33169f275dbe3146847898eb262d007, type: 3}
+  m_Name: Test Fighter 1
+  m_EditorClassIdentifier: 
+  Profile: {fileID: 11400000, guid: 739c5cec390b7ec41962058ad2cfcf96, type: 2}
+  States:
+  - {fileID: 11400000, guid: c1504b263a4b1c64f9d487be5ff2c65e, type: 2}
+  - {fileID: 11400000, guid: 37862ae1aeaa8f44487b7083216cd93c, type: 2}
+  - {fileID: 11400000, guid: cfc2ce5b4af41ac4a8f4cef18e4eb46a, type: 2}
+  Stances:
+  - {fileID: 11400000, guid: 42d7f9ac52fd6a44980264960525947a, type: 2}
+  MaxHealth: 10000
+  MaxSuperGauge: 10000
+  BaseAttack: 100
+  BaseDefense: 100
+  _aiData: {fileID: 0}
+  Intros: []
+  Outros: []
+  VictoryPoses: []
+  DefeatPose: 0

@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 
 namespace SakugaEngine.Resources
 {
-    [System.Serializable]
-    public partial class SpawnObject
+    [Serializable]
+    public class SpawnObject
     {
-        public GameObject SpawnPrefab;
-        public int Amount;
+        public string Key;
+        public GameObject Instance;
+        public int PoolSize;
     }
 }

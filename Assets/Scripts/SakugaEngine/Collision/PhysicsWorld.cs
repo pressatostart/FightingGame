@@ -1,4 +1,5 @@
 using UnityEngine;
+using SakugaEngine.Global;
 using SakugaEngine.Resources;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace SakugaEngine.Collision
             bodies = new List<PhysicsBody>();
             hitQueries = new List<HitQuery>();
             CreatedBodies = 0;
-            Steps = Mathf.Clamp(Global.SubSteps, MinSteps, MaxSteps);
+            Steps = Mathf.Clamp(GlobalVariables.SubSteps, MinSteps, MaxSteps);
         }
         
         public void AddBody(PhysicsBody newBody)
@@ -142,36 +143,35 @@ namespace SakugaEngine.Collision
 				{
 					Collider hitboxB = bodyB.Hitboxes[j];
 
-                    if (bodyA.HitConfirmed) return;
-			        if (bodyB.HitConfirmed) return;
-
 					if (hitboxA.IsOverlapping(hitboxB))
 					{
                         //Get current hitbox settings to reference the correct hitbox element
-						HitboxElement boxSettingsA = bodyA.GetCurrentHitbox().Hitboxes[i];
-						HitboxElement boxSettingsB = bodyB.GetCurrentHitbox().Hitboxes[j];
+						HitboxElement boxSettingsA = bodyA.CurrentHitbox.HitboxData.Hitboxes[i];
+						HitboxElement boxSettingsB = bodyB.CurrentHitbox.HitboxData.Hitboxes[j];
 
-						int myType = (int)boxSettingsA.HitboxType;
-						int otType = (int)boxSettingsB.HitboxType;
+						HitboxType myType = boxSettingsA.HitboxType;
+						HitboxType otType = boxSettingsB.HitboxType;
 
                         if (myType == 0 && otType == 0) continue;
-
-                        //SakugaActor body1 = bodyA.Parent as SakugaActor;
-                        //SakugaActor body2 = bodyB.Parent as SakugaActor;
 
                         Vector2Int ContactPoint = GetContactPoint(hitboxA, hitboxB);
 
                         //Basic damage
-						if (myType == 1 /*Hitbox*/  && otType == 0  /*Hurtbox*/ ) {
+						if (myType == HitboxType.HITBOX && otType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+                            
                             if (currentHit.p1HitType < 0)
                             {
                                 currentHit.p1HitType = 0;
                                 currentHit.p1Hitbox = boxSettingsA;
                                 currentHit.p1ContactPoint = ContactPoint;
                             }
-                            
 						}
-                        else if (otType == 1 /*Hitbox*/  && myType == 0  /*Hurtbox*/ ) {
+                        else if (otType == HitboxType.HITBOX && myType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+
                             if (currentHit.p2HitType < 0)
                             {
                                 currentHit.p2HitType = 0;
@@ -181,7 +181,10 @@ namespace SakugaEngine.Collision
                         }
                         
                         //Hitboxes clash
-						if (myType == 1 /*Hitbox*/ && otType == 1 /*Hitbox*/ ) {
+						if (myType == HitboxType.HITBOX && otType == HitboxType.HITBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB) || !bodyB.CanHitBody(bodyA)) return;
+
 							if (boxSettingsA.Priority != boxSettingsB.Priority) return;
 
                             if (currentHit.p1HitType < 0)
@@ -199,25 +202,34 @@ namespace SakugaEngine.Collision
 						}
 
                         //Projectile damage
-                        if (myType == 3 /*Projectile*/ && otType == 0 /*Hurtbox*/ ) {
+                        if (myType == HitboxType.PROJECTILE && otType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+
                             if (currentHit.p1HitType < 0)
                             {
-                                currentHit.p1HitType = 0; //<<< 0 for testing, maybe switch it back to 1
+                                currentHit.p1HitType = 0;
                                 currentHit.p1Hitbox = boxSettingsA;
                                 currentHit.p1ContactPoint = ContactPoint;
                             }
                         }
-                        else if (otType == 3 /*Projectile*/ && myType == 0 /*Hurtbox*/ ) {
+                        else if (otType == HitboxType.PROJECTILE && myType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+                            
                             if (currentHit.p2HitType < 0)
                             {
-                                currentHit.p2HitType = 0; //<<< 0 for testing, maybe switch it back to 1
+                                currentHit.p2HitType = 0;
                                 currentHit.p2Hitbox = boxSettingsB;
                                 currentHit.p2ContactPoint = ContactPoint;
                             }
                         }
 
                         //Projectile clash
-                        if (myType == 3 /*Projectile*/ && otType == 3 /*Projectile*/ ) {
+                        if (myType == HitboxType.PROJECTILE && otType == HitboxType.PROJECTILE)
+                        {
+                            if (!bodyA.CanHitBody(bodyB) || !bodyB.CanHitBody(bodyA)) return;
+
                             if (currentHit.p1HitType < 0)
                             {
                                 currentHit.p1HitType = 12;
@@ -233,7 +245,10 @@ namespace SakugaEngine.Collision
                         }
 
                         //Deflect projectiles
-                        if (myType == 3 /*Projectile*/ && otType == 6 /*Deflect*/ ) {
+                        if (myType == HitboxType.PROJECTILE && otType == HitboxType.DEFLECT)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+
                             if (currentHit.p1HitType < 0)
                             {
                                 currentHit.p1HitType = 10;
@@ -241,7 +256,10 @@ namespace SakugaEngine.Collision
                                 currentHit.p1ContactPoint = ContactPoint;
                             }
                         }
-                        else if (otType == 3 /*Projectile*/ && myType == 6 /*Deflect*/ ) {
+                        else if (otType == HitboxType.PROJECTILE && myType == HitboxType.DEFLECT)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+                            
                             if (currentHit.p2HitType < 0)
                             {
                                 currentHit.p2HitType = 10;
@@ -251,15 +269,24 @@ namespace SakugaEngine.Collision
                         }
                         
                         //Proximity block
-                        if (myType == 2 /*Proximity Block*/ && otType == 0 /*Hurtbox*/ ) {
-                            bodyB.Parent.ProximityBlock();
+                        if (myType == HitboxType.PROXIMITY_BLOCK && otType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+
+                            bodyB.Parent.ProximityBlock(boxSettingsA);
                         }
-                        else if (otType == 2 /*Proximity Block*/ && myType == 0 /*Hurtbox*/ ) {
-                            bodyA.Parent.ProximityBlock();
+                        else if (otType == HitboxType.PROXIMITY_BLOCK && myType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+
+                            bodyA.Parent.ProximityBlock(boxSettingsB);
                         }
 
 						//Throws
-                        if (myType == 4 /*Throw*/ && otType == 0 /*Hurtbox*/ ) {
+                        if (myType == HitboxType.THROW && otType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+
                             if (currentHit.p1HitType < 0)
                             {
                                 currentHit.p1HitType = 2;
@@ -267,7 +294,10 @@ namespace SakugaEngine.Collision
                                 currentHit.p1ContactPoint = ContactPoint;
                             }
                         }
-                        else if (otType == 4 /*Throw*/ && myType == 0 /*Hurtbox*/ ) {
+                        else if (otType == HitboxType.THROW && myType == HitboxType.HURTBOX)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+
                             if (currentHit.p2HitType < 0)
                             {
                                 currentHit.p2HitType = 2;
@@ -277,7 +307,10 @@ namespace SakugaEngine.Collision
                         }
 
                         //Counterattack (Needs some testing)
-                        if (myType == 5 /*Counter*/ && otType == 1 /*Hitbox*/) {
+                        if (myType == HitboxType.COUNTER && otType == HitboxType.HITBOX)
+                        {
+                            if (!bodyA.CanHitBody(bodyB)) return;
+
                             if (currentHit.p1HitType < 0)
                             {
                                 currentHit.p1HitType = 3;
@@ -285,7 +318,10 @@ namespace SakugaEngine.Collision
                                 currentHit.p1ContactPoint = ContactPoint;
                             }
                         }
-                        else if (otType == 5 /*Counter*/ && myType == 1 /*Hitbox*/) {
+                        else if (otType == HitboxType.COUNTER && myType == HitboxType.HITBOX)
+                        {
+                            if (!bodyB.CanHitBody(bodyA)) return;
+
                             if (currentHit.p2HitType < 0)
                             {
                                 currentHit.p2HitType = 3;
@@ -296,7 +332,6 @@ namespace SakugaEngine.Collision
 					}
 				}
 			}
-            //GD.Print($"{currentHit.p1HitType}, {currentHit.p2HitType}");
             hitQueries.Add(currentHit);
 		}
 
@@ -308,6 +343,12 @@ namespace SakugaEngine.Collision
             {
                 HitQuery currentHit = hitQueries[i];
                 if (currentHit.p1HitType < 0 && currentHit.p2HitType < 0) continue;
+
+                SakugaActor actor1 = currentHit.p1 as SakugaActor;
+                SakugaActor actor2 = currentHit.p2 as SakugaActor;
+                if (!actor1.CanHitTarget(actor2)) continue;
+                if (!actor2.CanHitTarget(actor1)) continue;
+                
                 //Basic damage
                 if (currentHit.p1HitType == 0 && currentHit.p2HitType != 0) {
                     currentHit.p1.BaseDamage(currentHit.p2 as SakugaActor, currentHit.p1Hitbox, currentHit.p1ContactPoint);
@@ -317,22 +358,22 @@ namespace SakugaEngine.Collision
                 }
                 else if (currentHit.p1HitType == 0 && currentHit.p2HitType == 0) {
                     //Hit trades
-                    currentHit.p1.HitTrade(currentHit.p2Hitbox, currentHit.p1ContactPoint);
-                    currentHit.p2.HitTrade(currentHit.p1Hitbox, currentHit.p2ContactPoint);
+                    currentHit.p1.HitTrade(currentHit.p2 as SakugaActor, currentHit.p2Hitbox, currentHit.p1ContactPoint);
+                    currentHit.p2.HitTrade(currentHit.p1 as SakugaActor, currentHit.p1Hitbox, currentHit.p2ContactPoint);
                 }
                 else if (currentHit.p1HitType == 11 && currentHit.p2HitType == 11) {
                     //Hitboxes clash
                     if (currentHit.p1Hitbox.Priority != currentHit.p2Hitbox.Priority) return;
 
-                    currentHit.p1.HitboxClash(currentHit.p1Hitbox, currentHit.p1ContactPoint);
-                    currentHit.p2.HitboxClash(currentHit.p2Hitbox, Vector2Int.zero);
+                    currentHit.p1.HitboxClash(currentHit.p2 as SakugaActor, currentHit.p1Hitbox, currentHit.p1ContactPoint);
+                    currentHit.p2.HitboxClash(currentHit.p1 as SakugaActor, currentHit.p2Hitbox, Vector2Int.zero);
                 }
                 else if (currentHit.p1HitType == 12 && currentHit.p2HitType == 12) {
                     //Projectile clash
                     if (currentHit.p2Hitbox.Priority >= currentHit.p1Hitbox.Priority)
-                        currentHit.p1.ProjectileClash(currentHit.p1Hitbox, currentHit.p1ContactPoint);
+                        currentHit.p1.ProjectileClash(currentHit.p2 as SakugaActor, currentHit.p1Hitbox, currentHit.p1ContactPoint);
                     if (currentHit.p1Hitbox.Priority >= currentHit.p2Hitbox.Priority)
-                        currentHit.p2.ProjectileClash(currentHit.p2Hitbox, currentHit.p2ContactPoint);
+                        currentHit.p2.ProjectileClash(currentHit.p1 as SakugaActor, currentHit.p2Hitbox, currentHit.p2ContactPoint);
                 }
 
                 /*//Projectile damage
@@ -390,7 +431,7 @@ namespace SakugaEngine.Collision
 
             Vector2Int Depth = (A.Size + B.Size) / 2;
             Depth.x -= Mathf.Abs(length.x);
-            Depth.y -= Mathf.Abs(length.y);
+            Depth.x -= Mathf.Abs(length.y);
 
             return Depth;
         }

@@ -1,51 +1,48 @@
 using UnityEngine;
 using SakugaEngine.Resources;
-using System.IO;
+using SakugaEngine.Global;
 
 namespace SakugaEngine
 {
     public partial class StanceManager : MonoBehaviour
     {
-        private SakugaFighter owner;
+        private SakugaActor _owner;
+        public FrameTimer MoveBuffer;
 
-        public int DefaultStance = 0;
-        public FighterStance[] Stances;
-
+        [HideInInspector] public bool CanRun;
         [HideInInspector] public int CurrentStance;
         [HideInInspector] public int BufferedMove = -1;
         [HideInInspector] public int CurrentMove = -1;
-        [HideInInspector] public bool CanMoveCancel;
+        [HideInInspector] public bool CancelBuffer;
 
-        private ushort buttonChargeState;
-
-        public void Initialize(SakugaFighter owner)
+        public void Initialize(SakugaActor owner)
         {
-            this.owner = owner;
-            CurrentStance = DefaultStance;
+            _owner = owner;
+            CurrentStance = 0;
         }
 
         public bool CheckMoveConditions(int index)
         {
+            if (!CheckAllowedStateType(index)) return false;
+
             if (CurrentMove >= 0)
             {
-                if (CurrentMove == index)
-                {
-                    bool canOverride = !GetCurrentMove().CanBeOverrided || (GetCurrentMove().CanBeOverrided && GetCurrentMove().CanOverrideToSelf);
-
-                    if (!canOverride) return false;
-                }
-
+                if (CurrentMove == index && GetMove(index).IgnoreSelf) return false;
                 if (GetMove(index).PriorityBuffer && GetMove(index).Priority < GetCurrentMove().Priority) return false;
             }
+            if (GetMove(index).AcceptHitReactionStates && GetMove(index).IgnoreKnockdownHits && _owner.HitstunType >= HitstunType.KNOCKDOWN) return false;
 
-            int distance = Global.HorizontalDistance(owner.GetOpponent().Body.FixedPosition, owner.Body.FixedPosition);
+            if (_owner.Parameters.SuperGauge.CurrentValue < GetMove(index).SuperGaugeRequired) return false;
+
+            bool isDesiredHealth = _owner.Parameters.Health.CurrentValue >= GetMove(index).HealthRequired.x &&
+                _owner.Parameters.Health.CurrentValue <= GetMove(index).HealthRequired.y;
+            if (!isDesiredHealth) return false;
+
+            int distance = GlobalFunctions.Distance(_owner.GetOpponent(0).Body.FixedPosition, _owner.Body.FixedPosition).x;
             bool isValidDistance = distance >= GetMove(index).DistanceArea.x && distance <= GetMove(index).DistanceArea.y;
             if (!isValidDistance) return false;
 
-            bool isCorrectSurface = (GetMove(index).UseOnGround && owner.Body.IsOnGround) ||
-                (GetMove(index).UseOnAir && !owner.Body.IsOnGround) ||
-                (GetMove(index).UseOnGround && GetMove(index).UseOnAir);
-            if (!isCorrectSurface) return false;
+            if (!IsCorrectSurface(index)) return false;
 
             bool isValidState = CheckStatesToIgnore(index);
             if (!isValidState) return false;
@@ -53,181 +50,184 @@ namespace SakugaEngine
             bool isCorrectState = CheckOwnerState(index);
             if (!isCorrectState) return false;
 
-            bool isDesiredHealth = owner.Variables.CurrentHealth >= GetMove(index).HealthThreshold.x &&
-                owner.Variables.CurrentHealth <= GetMove(index).HealthThreshold.y;
-            if (!isDesiredHealth) return false;
+            if (!_owner.Parameters.CompareVariables(GetMove(index).VariablesRequirement)) return false;
             
-            if (owner.Variables.CurrentSuperGauge < GetMove(index).SuperGaugeRequired) return false;
-
-            if (!owner.Variables.CompareExtraVariables(GetMove(index).ExtraVariablesRequirement)) return false;
-            
-            bool AllowedFrameWindow = owner.Animator.GetCurrentState().Loop || !owner.Animator.GetCurrentState().Loop && owner.Animator.Frame < GetMove(index).FrameLimit;
-            if (GetMove(index).FrameLimit > 0 && !AllowedFrameWindow) return false;
+            //bool AllowedFrameWindow = _owner.StateManager.GetCurrentState().Loop || !_owner.StateManager.GetCurrentState().Loop && _owner.StateManager.CurrentStateFrame < GetMove(index).FrameLimit;
+            //if (GetMove(index).FrameLimit > 0 && !AllowedFrameWindow) return false;
             
             return true;
         }
 
         public void CheckMoves()
         {
-            if (owner.Animator.StateType() > 3) return;
-
-            if (CurrentMove >= 0)
-                owner.Variables.AddSuperGauge(GetCurrentMove().BuildSuperGauge);
+            if (MoveBuffer == null) return;
+            if (!CanRun) return;
 
             for (int i = GetMoveListLength() - 1; i >= 0; i--)
             {
+                if (GetMove(i).SkipCheck) continue;
                 if (!CheckMoveConditions(i)) continue;
-                if (owner.Inputs.CheckMotionInputs(GetMove(i).Inputs))
+                if (_owner.Inputs.CheckMotionInputs(GetMove(i).Inputs, _owner.InputSide(GetMove(i).SideCheck)))
                 {
-                    BufferedMove = i;
-                    owner.MoveBuffer.Play();
+                    BufferMove(i, false);
                     break;
                 }
             }
-            
-            AttackBufferStorage();
-            ChargeButtonSequence();
+
+            //if (CurrentMove >= 0)
+                //_owner.Parameters.SuperGauge.AddSuperGauge(GetCurrentMove().BuildSuperGauge);
+
             CheckMoveEndCondition();
+            CheckMoveCancel();
+            ProcessMoveBuffer();
         }
 
-        public void ExecuteMove()
+        private void BufferMove(int moveIndex, bool moveCancel)
         {
-            if (GetMove(BufferedMove).InterruptCornerPushback) owner.StopPushing();
-            owner.Variables.CurrentSuperGauge -= GetMove(BufferedMove).SuperGaugeRequired;
+            BufferedMove = moveIndex;
+            CancelBuffer = moveCancel;
+            MoveBuffer.StartTimer(GlobalVariables.MoveBufferLength);
+        }
 
-            if (owner.Variables.CurrentHealth > 10 && GetMove(BufferedMove).SpendHealth > 0)
-                owner.Variables.CurrentHealth -= GetMove(BufferedMove).SpendHealth;
+        public void ExecuteMove(int moveIndex)
+        {
+            _owner.Parameters.SuperGauge.CurrentValue -= GetMove(moveIndex).SuperGaugeRequired;
 
-            if (GetMove(BufferedMove).SuperFlash > 0 && !owner.SuperFlash)
+            if (GetMove(moveIndex).SuperFlash > 0 && !_owner.SuperFlashing)
             {
-                owner.GetOpponent().SuperFlash = true;
-                owner.GetOpponent().HitStop.Play((uint)GetMove(BufferedMove).SuperFlash);
+                _owner.GetOpponent(0).StartSuperFlash((uint)GetMove(moveIndex).SuperFlash);
             }
 
-            if (GetMove(BufferedMove).MoveState >= 0) 
-                owner.Animator.PlayState(GetMove(BufferedMove).MoveState, true);
+            if (GetMove(moveIndex).MoveState >= 0) 
+                _owner.StateManager.PlayState(GetMove(moveIndex).MoveState, true);
             
-            owner.Variables.ExtraVariablesOnMoveEnter();
-            
-            owner.Variables.SetExtraVariables(GetMove(BufferedMove).ExtraVariablesChange);
+            _owner.Parameters.ChangeVariablesBehavior(CustomVariableBehaviorTarget.ON_MOVE_ENTER);
+            _owner.Parameters.SetVariables(GetMove(moveIndex).VariablesChange);
 
-            CurrentMove = BufferedMove;
+            CurrentMove = moveIndex;
             BufferedMove = -1;
-
-            CanMoveCancel = false;
+            CancelBuffer = false;
+            MoveBuffer.Stop();
 
             Debug.Log("You executed " + GetCurrentMove().MoveName + "!");
         }
 
-        public void AttackBufferStorage()
+        private void CheckMoveCancel()
         {
-            if (BufferedMove >= 0)
+            if (CurrentMove < 0) return;
+            if (!CanRun) return;
+            if (GetCurrentMove().CanCancelTo == null) return;
+            if (GetCurrentMove().CanCancelTo.Length <= 0) return;
+
+            foreach (MoveCancelSettings cancel in GetCurrentMove().CanCancelTo)
             {
-                if (!owner.MoveBuffer.IsRunning() && !owner.SuperFlash)
-                {
-                    BufferedMove = -1;
-                    Debug.Log("Buffer Cleaned!");
-                }
-                else if (!owner.HitStop.IsRunning())
-                {
-                    bool CanOverride = CurrentMove < 0 || (GetCurrentMove().CanBeOverrided && 
-                                        (GetCurrentMove().IgnoreSamePriority ? 
-                                        GetMove(BufferedMove).Priority > GetCurrentMove().Priority : 
-                                        GetMove(BufferedMove).Priority >= GetCurrentMove().Priority));
-                    
-                    bool allowMoveCancel = CanMoveCancel || owner.Body.ContainsFrameProperty((byte)Global.FrameProperties.FORCE_MOVE_CANCEL);
-                    
-                    bool canCancelThis = (allowMoveCancel && CanCancel()) || 
-                                (owner.Animator.Frame < Global.KaraCancelWindow && CanKaraCancel());
-                                        
-                    bool isValidStateType = GetMove(BufferedMove).WaitForNullStates ? 
-                                            (owner.Animator.GetCurrentState().Type > Global.StateType.NULL &&
-                                            owner.Animator.GetCurrentState().Type <= Global.StateType.COMBAT) :
-                                            owner.Animator.GetCurrentState().Type <= Global.StateType.COMBAT;
-                    
-                    if (isValidStateType && (CanOverride || canCancelThis))
-                    {
-                        ExecuteMove();
-                        //GD.Print("You executed " + GetCurrentMove().MoveName + "!");
-                    }
-                    else Debug.Log("Move " + GetMove(BufferedMove).MoveName + " Buffered!");
+                if (!CheckCancelConditions(cancel)) continue;
+                if (!CheckMoveConditions(cancel.MoveIndex)) continue;
+                if (_owner.Inputs.CheckMotionInputs(GetMove(cancel.MoveIndex).Inputs, _owner.InputSide(GetMove(cancel.MoveIndex).SideCheck)))
+                {                    
+                    BufferMove(cancel.MoveIndex, true);
+                    break;
                 }
             }
         }
 
-        private void ChargeButtonSequence()
+        public void ProcessMoveBuffer()
         {
-            if (CurrentMove < 0) return;
-            if (GetCurrentMove().buttonChargeSequence.Length == 0 || GetCurrentMove().buttonChargeSequence == null) return;
-
-            if (owner.Inputs.CheckInputEnd(GetCurrentMove().Inputs))
+            if (BufferedMove < 0) return;
+            //if (CurrentMove >= 0 && !GetCurrentMove().CanBeOverrided) return;
+            if (!MoveBuffer.IsRunning() || !IsCorrectSurface(BufferedMove))
             {
-                ButtonChargeSequence currSequence;
-                for (int i = 0; i < GetCurrentMove().buttonChargeSequence.Length; i++)
-                {
-                    currSequence = GetCurrentMove().buttonChargeSequence[i];
-                    if (Global.IsOnRange((int)buttonChargeState, currSequence.Threshold.x, currSequence.Threshold.y))
-                    {
-                        if (CheckMoveConditions(currSequence.SequenceMove))
-                        {
-                            CurrentMove = -1;
-                            BufferedMove = currSequence.SequenceMove;
-                            ExecuteMove();
-                        }
-                    }
-                }
+                BufferedMove = -1;
+                Debug.Log("Buffer Cleaned!");
+                return;
             }
-            else
+            if (!CancelBuffer && _owner.StateManager.CurrentStateType() == StateType.COMBAT) return;
+
+            if (!GetBufferedMove().Unlockable && _owner.ContainsFrameProperty(FrameProperties.LOCK_MOVE)) return;
+            if (!GetBufferedMove().IgnoreHitstop && _owner.Hitstop.IsRunning()) return;
+            if (!GetBufferedMove().IgnoreHitstun && _owner.Hitstun.IsRunning()) return;
+            
+            bool CanOverride = CurrentMove < 0 || CancelBuffer || (GetCurrentMove().CanBeOverrided && 
+                                (GetCurrentMove().IgnoreSamePriority ? 
+                                GetBufferedMove().Priority > GetCurrentMove().Priority : 
+                                GetBufferedMove().Priority >= GetCurrentMove().Priority));
+
+            if (CanOverride)
             {
-                if (owner.Inputs.CurrentInput().bCharge > 0) buttonChargeState = owner.Inputs.CurrentInput().bCharge;
-
-                ButtonChargeSequence limitSequence = GetCurrentMove().buttonChargeSequence[GetCurrentMove().buttonChargeSequence.Length - 1];
-
-                if (owner.Inputs.InputBufferDuration() > limitSequence.Threshold.y)
-                {
-                    if (CheckMoveConditions(limitSequence.SequenceMove))
-                    {
-                        CurrentMove = -1;
-                        BufferedMove = limitSequence.SequenceMove;
-                        ExecuteMove();
-                    }
-                }
+                ExecuteMove(BufferedMove);
             }
+            else Debug.Log("Move " + GetBufferedMove().MoveName + " Buffered!");
+        }
+
+        public bool IsCorrectSurface(int index)
+        {
+            return (GetMove(index).UseOnGround && _owner.Body.IsOnGround) ||
+                (GetMove(index).UseOnAir && !_owner.Body.IsOnGround && _owner.Body.FixedPosition.y >= GetMove(index).MinimumHeight) ||
+                (GetMove(index).UseOnGround && GetMove(index).UseOnAir);
+        }
+
+        public bool CheckAllowedStateType(int moveIndex)
+        {
+            bool notLockedState =  _owner.StateManager.GetCurrentState().Type != StateType.LOCKED;
+            bool checkNullState = GetMove(moveIndex).AcceptNullStates && _owner.StateManager.GetCurrentState().Type == StateType.NULL;
+            bool checkMovementState = GetMove(moveIndex).AcceptMovementStates && _owner.StateManager.GetCurrentState().Type == StateType.MOVEMENT;
+            bool checkCombatState = GetMove(moveIndex).AcceptCombatStates && _owner.StateManager.GetCurrentState().Type == StateType.COMBAT;
+            bool checkBlockingState = GetMove(moveIndex).AcceptBlockingStates && _owner.StateManager.GetCurrentState().Type == StateType.BLOCKING;
+            bool checkHitReactionState = GetMove(moveIndex).AcceptHitReactionStates && _owner.StateManager.GetCurrentState().Type == StateType.HIT_REACTION && _owner.HitstunType < HitstunType.HARD_KNOCKDOWN;
+
+            return notLockedState && (checkNullState || checkMovementState || checkCombatState || checkBlockingState || checkHitReactionState);
         }
 
         private void CheckMoveEndCondition()
         {
             if (CurrentMove < 0) return;
 
-            if ((int)GetCurrentMove().MoveEnd == 0 && owner.Animator.CurrentState != GetCurrentMove().MoveState ||
-                (int)GetCurrentMove().MoveEnd == 1 && owner.Inputs.CheckInputEnd(GetCurrentMove().Inputs) ||
-                (int)GetCurrentMove().MoveEnd == 2 && owner.Animator.StateType() != (int)owner.Animator.States[GetCurrentMove().MoveState].Type)
+            switch (GetCurrentMove().MoveEnd)
             {
-                ResetStance();
+                case MoveEndCondition.STATE_END:
+                    if (_owner.StateManager.CurrentState != GetCurrentMove().MoveState)
+                        EndMove();
+                    break;
+                case MoveEndCondition.RELEASE_BUTTON:
+                    if (_owner.Inputs.CheckInputEnd(GetCurrentMove().Inputs, _owner.InputSide(GetCurrentMove().SideCheck)))
+                        EndMove();
+                    break;
+                case MoveEndCondition.STATE_TYPE_CHANGE:
+                    if (_owner.StateManager.CurrentStateType() != _owner.Data.States[GetCurrentMove().MoveState].Type)
+                        EndMove();
+                    break;
+                case MoveEndCondition.ON_FALL:
+                    if (_owner.Body.IsFalling)
+                        EndMove();
+                    break;
             }
         }
 
-        public void ResetStance()
+        public void EndMove()
         {
             if (GetCurrentMove().MoveEndState >= 0)
-                owner.Animator.PlayState(GetCurrentMove().MoveEndState, false);
-            
-            if (CanMoveCancel) CanMoveCancel = false;
-            
-            if (GetCurrentMove().ChangeStance >= 0)
-            {
-                CurrentStance = GetCurrentMove().ChangeStance;
-                BufferedMove = -1;
-            }
+                _owner.StateManager.PlayState(GetCurrentMove().MoveEndState, false);
+
             CurrentMove = -1;
-            owner.Variables.ExtraVariablesOnMoveExit();
+            _owner.Parameters.ChangeVariablesBehavior(CustomVariableBehaviorTarget.ON_MOVE_EXIT);
+        }
+
+        public void CallStance(int NextStance)
+        {
+            CurrentStance = NextStance;
+            CurrentMove = -1;
+            BufferedMove = -1;
+            CancelBuffer = false;
+            MoveBuffer.Stop();
         }
 
         public void Clear()
         {
             CurrentMove = -1;
-            CanMoveCancel = false;
+            BufferedMove = -1;
+            CancelBuffer = false;
             if (!GetCurrentStance().IsDamagePersistent) CurrentStance = 0;
+            MoveBuffer.Stop();
         }
 
         public bool CheckOwnerState(int index)
@@ -237,7 +237,7 @@ namespace SakugaEngine
             
             foreach (int possibleStates in GetMove(index).IsSequenceFromStates)
             {
-                if (owner.Animator.CurrentState == possibleStates)
+                if (_owner.StateManager.CurrentState == possibleStates)
                     return true;
             }
             return false;
@@ -250,60 +250,84 @@ namespace SakugaEngine
             
             foreach (int possibleStates in GetMove(index).IgnoreStates)
             {
-                if (owner.Animator.CurrentState == possibleStates)
+                if (_owner.StateManager.CurrentState == possibleStates)
                     return false;
             }
             return true;
         }
 
-        public bool CanCancel()
+        private bool CheckCancelConditions(MoveCancelSettings cancelSettings)
         {
-            if (CurrentMove < 0) return false;
-            if (GetCurrentMove().CancelsTo == null) return false;
-            if (GetCurrentMove().CancelsTo.Length <= 0) return false;
-
-            foreach (int possibleCancel in GetCurrentMove().CancelsTo)
+            bool isKaraCancel = ((_owner.CancelConditions & cancelSettings.Conditions) & CancelCondition.KARA_CANCEL) > 0;
+            if ((_owner.CancelConditions & cancelSettings.Conditions) > 0 && ((isKaraCancel && _owner.StateManager.CurrentStateFrame < GlobalVariables.KaraCancelWindow) ||
+            (!isKaraCancel && _owner.StateManager.CurrentStateFrame >= cancelSettings.FrameThreshold.x && _owner.StateManager.CurrentStateFrame <= cancelSettings.FrameThreshold.y)))
             {
-                if (BufferedMove == possibleCancel)
-                    return true;
+                return true;
             }
             return false;
         }
 
-        public bool CanKaraCancel()
+        public int GetBlockState(HitType Type, byte state)
         {
-            if (CurrentMove < 0) return false;
-            if (GetCurrentMove().KaraCancelsTo == null) return false;
-            if (GetCurrentMove().KaraCancelsTo.Length <= 0) return false;
+            if (_owner.StateManager.CurrentStateType() == StateType.HIT_REACTION) return -1;
+            if (_owner.StateManager.CurrentStateType() == StateType.LOCKED) return -1;
+            if (_owner.StateManager.CurrentStateType() == StateType.COMBAT && _owner.StateManager.CurrentStateFrame >= GlobalVariables.KaraCancelWindow) return -1;
+            if (GetCurrentStance().BlockReactions == null || GetCurrentStance().BlockReactions.Length == 0) return -1;
+            for (int i = 0; i < GetCurrentStance().BlockReactions.Length; i++)
+            {
+                BlockSettings block = GetCurrentStance().BlockReactions[i];
+                if (_owner.Body.IsOnGround && block.ReferenceStance == StanceSelect.AIR) continue;
+                if (!_owner.Body.IsOnGround && block.ReferenceStance != StanceSelect.AIR) continue;
+                if (!ValidHitType(Type, block.BlockType)) continue;
+                if (block.InputToCheck == null) continue;
+                if (!_owner.Inputs.CheckMotionInputs(block.InputToCheck, _owner.InputSide(InputSideCheck.SIDE_RELATIVE))) continue;
 
-                foreach (int possibleKaraCancel in GetCurrentMove().KaraCancelsTo)
+                switch (state)
                 {
-                    if (BufferedMove == possibleKaraCancel)
-                        return true;
+                    case 0:
+                        return block.EnterState;
+                    case 1:
+                        return block.StunState;
+                    case 2:
+                        return block.GuardCrushState;
                 }
+            }
+            return -1;
+        }
+
+        public int ExitBlockState(StanceSelect stance)
+        {
+            if (GetCurrentStance().BlockReactions == null || GetCurrentStance().BlockReactions.Length == 0) return -1;
+            for (int i = 0; i < GetCurrentStance().BlockReactions.Length; i++)
+            {
+                BlockSettings block = GetCurrentStance().BlockReactions[i];
+                if (!IsValidStance(block.ReferenceStance, stance)) continue;
+
+                return block.ExitState;
+            }
+            return -1;
+        }
+
+        private bool IsValidStance(StanceSelect stance, StanceSelect compare)
+        {
+            return stance == compare;
+        }
+
+        private bool ValidHitType(HitType hitType, BlockType blockType)
+        {
+            if (hitType == HitType.UNBLOCKABLE) return false;
+            if (hitType == HitType.HIGH && (blockType & BlockType.HIGH) > 0) return true;
+            if (hitType == HitType.MEDIUM && (blockType & BlockType.MEDIUM) > 0) return true;
+            if (hitType == HitType.LOW && (blockType & BlockType.LOW) > 0) return true;
+
             return false;
         }
 
-        public FighterStance GetCurrentStance() => Stances[CurrentStance];
+        public FighterStance GetStance(int index) => _owner.Data.Stances[index];
+        public FighterStance GetCurrentStance() => GetStance(CurrentStance);
         public MoveSettings GetMove(int index) => GetCurrentStance().Moves[index];
         public MoveSettings GetCurrentMove() => GetMove(CurrentMove);
+        public MoveSettings GetBufferedMove() => GetMove(BufferedMove);
         public int GetMoveListLength() => GetCurrentStance().Moves.Length;
-        public bool CanAutoTurn() => CurrentMove < 0 || (int)GetCurrentMove().SideChange > 0;
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.Write(CurrentStance);
-            bw.Write(BufferedMove);
-            bw.Write(CurrentMove);
-            bw.Write(CanMoveCancel);
-        }
-
-        public void Deserialize(BinaryReader br)
-        {
-            CurrentStance = br.ReadInt32();
-            BufferedMove = br.ReadInt32();
-            CurrentMove = br.ReadInt32();
-            CanMoveCancel = br.ReadBoolean();
-        }
     }
 }

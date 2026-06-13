@@ -1,34 +1,52 @@
 using UnityEngine;
-using System;
 using PleaseResync;
 
 namespace SakugaEngine.Game
 {
-    public class SakugaRollbackManager : PleaseResyncManager
+    public partial class SakugaRollbackManager : PleaseResyncManager
     {
-        private const uint MAX_PLAYERS = 2;
-        private const uint MAX_SPECTETORS = 10;
-
         [SerializeField] private GameManager GameManager;
 
         public void Start()
         {
             GameManager.InputSize = InputSize;
+            //UseLAN = GameManager.Match.SelectedModeSettings.UseLAN;
+
+            Debug.Log($"Starting {GameManager.Match.SelectedModeSettings.ModeName} mode.");
+
+            if (GameManager.Match.SelectedModeSettings.AutoStart)
+            {
+                switch(GameManager.Match.SelectedModeSettings.NetcodeMode)
+                {
+                    case Global.NetcodeMode.LOCAL:
+                        LocalGame(2);
+                        break;
+                    case Global.NetcodeMode.ONLINE:
+                        //OnlineGame(GameManager.Match.IsSpectator, 2, (uint)GameManager.Match.SpectatorCount, (uint)GameManager.Match.PlayerID);
+                        OnlineGame(2, (uint)GameManager.Match.PlayerID);
+                        break;
+                    case Global.NetcodeMode.REPLAY:
+                        ReplayMode(2);
+                        break;
+                }
+            }
         }
 
+        //public override void OnlineGame(bool spectate, uint players, uint spectators, uint ID)
         public override void OnlineGame(uint maxPlayers, uint ID)
         {
+            //StartOnlineGame(GameManager, spectate, players, spectators, ID);
             StartOnlineGame(GameManager, maxPlayers, ID);
         }
 
-        public override void LocalGame(uint maxPlayers)
+        public override void LocalGame(uint players)
         {
-            StartOfflineGame(GameManager, maxPlayers);
+            StartOfflineGame(GameManager, players);
         }
 
-        public override void ReplayMode(uint maxPlayers)
+        public override void ReplayMode(uint players)
         {
-            StartReplay(GameManager, maxPlayers);
+            StartReplay(GameManager, players);
         }
     }
 }

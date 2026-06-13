@@ -21,14 +21,14 @@ namespace PleaseResync
         /// Called when the game is simulated. It saves a snapshot of the current tick.
         /// </summary>
         /// <param name="bw">Serialization</param>
-        void SaveState(BinaryWriter bw);
+        byte[] SaveState();
         
         /// <summary>
         /// LoadState()
         /// Called only during rollbacks. It gets the saved snapshot of the selected tick to resimulate it
         /// </summary>
         /// <param name="br">Deserialization</param>
-        void LoadState(BinaryReader br);
+        void LoadState(byte[] stateBuffer);
         
         /// <summary>
         /// GetLocalInput()
@@ -36,6 +36,6 @@ namespace PleaseResync
         /// </summary>
         /// <param name="PlayerID">The selected player's ID</param>
         /// <returns>A byte array to use in the simulation by the specified player</returns>
-        byte[] GetLocalInput(int PlayerID);
+        byte[] GetLocalInput(int PlayerID, int InputSize);
     }
 }

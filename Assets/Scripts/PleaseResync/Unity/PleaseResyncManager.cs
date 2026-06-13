@@ -188,7 +188,7 @@ namespace PleaseResync
             else
                 for (int i = 0; i < LastInput.Length / InputSize; i++)
                 {
-                    byte[] inputs = SyncTest ? GetRandomInput() : sessionState.GetLocalInput(i);
+                    byte[] inputs = SyncTest ? GetRandomInput() : sessionState.GetLocalInput(i, (int)InputSize);
                     Array.Copy(inputs, 0, LastInput, i * InputSize, inputs.Length);
                 }
 
@@ -204,15 +204,10 @@ namespace PleaseResync
                         if (!Replay) RecordInput(AFAction.Frame, AFAction.Inputs);
                         break;
                     case SessionLoadGameAction LGAction:
-                        MemoryStream readerStream = new MemoryStream(LGAction.Load());
-                        BinaryReader reader = new BinaryReader(readerStream);
-                        sessionState.LoadState(reader);
+                        sessionState.LoadState(LGAction.Load());
                         break;
                     case SessionSaveGameAction SGAction:
-                        MemoryStream writerStream = new MemoryStream();
-                        BinaryWriter writer = new BinaryWriter(writerStream);
-                        sessionState.SaveState(writer);
-                        byte[] state = writerStream.ToArray();
+                        byte[] state = sessionState.SaveState();
                         SGAction.Save(state, Platform.GetChecksum(state));
                         break;
                 }

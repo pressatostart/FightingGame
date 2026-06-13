@@ -1,43 +1,58 @@
 using UnityEngine;
-using System;
 
 namespace SakugaEngine
 {
-    public class SoundQueue : MonoBehaviour
+    public partial class SoundQueue : MonoBehaviour
     {
-        [SerializeField] private AudioSource source;
+        private AudioSource Source;
+        [SerializeField] private ushort QueueDelay = 12;
+        [SerializeField] private AudioClip DefaultSound;
         private bool Queued;
+        private ushort QueueTimer = 0;
+        private AudioClip BufferedSound;
 
-        public void Awake()
+        public void FixedUpdate()
         {
-            source = GetComponent<AudioSource>();
-        }
-        public void Update()
-        {
+            TickQueueTimer();
             PlayQueue();
         }
 
         public void SimpleQueueSound()
         {
+            if (Queued) return;
+            
+            BufferedSound = DefaultSound;
             Queued = true;
         }
 
         public void QueueSound(AudioClip sound)
         {
-            if (Queued && source.clip == sound) return;
+            if (Queued && Source.clip == sound) return;
 
-            source.clip = sound;
+            BufferedSound = sound;
+            QueueTimer = 0;
             Queued = true;
         }
 
         public void PlayQueue()
         {
             if (!Queued) return;
-            if (source.clip == null) return;
-            if (source.isPlaying) return;
+            if (BufferedSound == null) return;
+            if (QueueTimer > 0) return;
 
-            source.Play();
+            Source.clip = BufferedSound;
+            
+            Source.Play();
+            QueueTimer = QueueDelay;
             Queued = false;
+            BufferedSound = null;
+        }
+
+        private void TickQueueTimer()
+        {
+            if (QueueTimer == 0) return;
+
+            QueueTimer--;
         }
     }
 }

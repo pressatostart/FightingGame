@@ -1,5 +1,5 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 namespace SakugaEngine.Resources
 {
@@ -9,23 +9,13 @@ namespace SakugaEngine.Resources
         [Header("Settings")]
         public bool IsDamagePersistent;
         public bool IsRoundPersistent;
-        public int NeutralState = 0;
+        public int DefaultState = 0;
         public MoveSettings[] Moves;
         public int[] HitReactions;
-
-        [Header("Blocking")]
-        public int GroundBlockInitialState = -1;
-        public int CrouchBlockInitialState = -1;
-        public int AirBlockInitialState = -1;
-
-        [Header("Recovery")]
-        public int GroundForwardRecoveryState = -1;
-        public int GroundBackwardsRecoveryState = -1;
-        public int AirForwardRecoveryState = -1;
-        public int AirBackwardsRecoveryState = -1;
-        public int OffTheGroundRecoveryState = -1;
+        public BlockSettings[] BlockReactions;
 
         [Header("Throw Escape")]
+        public MotionInputs ThrowEscapeInput;
         public int GroundThrowEscapeState = -1;
         public int AirThrowEscapeState = -1;
     }

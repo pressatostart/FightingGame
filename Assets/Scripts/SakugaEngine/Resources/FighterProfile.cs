@@ -9,5 +9,10 @@ namespace SakugaEngine.Resources
         public string ShortName;
         public Sprite Render;
         public Sprite Portrait;
+        public Sprite VictoryRender;
+        public Sprite OnlineIcon;
+        [TextArea] public string Bio;
+        public int AutoStage = 0;
+        public int AutoBGM = 0;
     }
 }

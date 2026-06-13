@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
+using SakugaEngine.Global;
 
 namespace SakugaEngine.UI
 {
@@ -19,9 +19,9 @@ namespace SakugaEngine.UI
             {
                 el++;
                 int element = el + manager.CurrentHistory;
-                elements[e].gameObject.SetActive(manager.InputHistory[element % Global.InputHistorySize].duration != 0);
+                elements[e].gameObject.SetActive(manager.InputHistory[element % GlobalVariables.InputHistorySize].duration != 0);
 
-                elements[e].SetHistory(manager.InputHistory[element % Global.InputHistorySize]);
+                elements[e].SetHistory(manager.InputHistory[element % GlobalVariables.InputHistorySize]);
             }
         }
 

@@ -7,8 +7,7 @@ namespace SakugaEngine.Resources
     {
         // Hitbox settings
         [Header("Box Settings")]
-        public Vector2Int Center = Vector2Int.zero;
-        public Vector2Int Size = Vector2Int.zero;
+        public BoxShape BoxArea;
         public Global.HitboxType HitboxType;
         public Global.HitType HitType;
 
@@ -67,12 +66,12 @@ namespace SakugaEngine.Resources
         public int AirBlockKnockbackTime = 8;
         public int AirBlockstun = 8;
         
-
         //Throw settings
         [Header("Throw Hit Settings")]
         public bool GroundThrow;
         public bool AirThrow;
-        public int ThrowHitStopDuration = 8;
+        public int ThrowHitstop = 16;
+        public int ThrowHitstopAfterHit = 30;
         public int ThrowHitReaction = -1;
 
         //Pushback settings
@@ -81,15 +80,10 @@ namespace SakugaEngine.Resources
         public int SelfPushbackForce = -30000;
         public int SelfPushbackDuration = 8;
 
-        //Extra settings
-        [Header("Extra Settings")]
-        public int HitConfirmState = -1;
-        public bool AllowInertia = true;
-        public int BounceXTime = 0;
+        //Bounce settings
+        [Header("Bounce Settings")]
+        public int BounceTime = 0;
         public int BounceXIntensity = 100;
-        public int BounceXState = -1;
-        public int BounceYTime = 0;
         public int BounceYIntensity = 100;
-        public int BounceYState = -1;
     }
 }

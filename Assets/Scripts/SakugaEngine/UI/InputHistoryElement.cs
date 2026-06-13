@@ -1,5 +1,5 @@
 using UnityEngine;
-using SakugaEngine;
+using SakugaEngine.Global;
 using TMPro;
 using UnityEngine.UI;
 
@@ -27,16 +27,16 @@ namespace SakugaEngine.UI
             int v;
             int dir = 0;
 
-            if ((reg.rawInput & Global.INPUT_RIGHT) != 0)
+            if ((reg.rawInput & PlayerInputs.RIGHT) != 0)
                 h = 1;
-            else if ((reg.rawInput & Global.INPUT_LEFT) != 0)
+            else if ((reg.rawInput & PlayerInputs.LEFT) != 0)
                 h = -1;
             else
                 h = 0;
 
-            if ((reg.rawInput & Global.INPUT_DOWN) != 0)
+            if ((reg.rawInput & PlayerInputs.DOWN) != 0)
                 v = -1;
-            else if ((reg.rawInput & Global.INPUT_UP) != 0)
+            else if ((reg.rawInput & PlayerInputs.UP) != 0)
                 v = 1;
             else
                 v = 0;
@@ -51,10 +51,10 @@ namespace SakugaEngine.UI
             else if (h == 0 && v > 0) dir = 7;
             else if (h > 0 && v > 0) dir = 8;
                 
-            bool a = (reg.rawInput & Global.INPUT_FACE_A) != 0;
-            bool b = (reg.rawInput & Global.INPUT_FACE_B) != 0;
-            bool c = (reg.rawInput & Global.INPUT_FACE_C) != 0;
-            bool d = (reg.rawInput & Global.INPUT_FACE_D) != 0;
+            bool a = (reg.rawInput & PlayerInputs.FACE_A) != 0;
+            bool b = (reg.rawInput & PlayerInputs.FACE_B) != 0;
+            bool c = (reg.rawInput & PlayerInputs.FACE_C) != 0;
+            bool d = (reg.rawInput & PlayerInputs.FACE_D) != 0;
 
             directional.sprite = Frames[dir];
                 

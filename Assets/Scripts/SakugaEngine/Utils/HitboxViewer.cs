@@ -1,6 +1,7 @@
 using UnityEngine;
 using SakugaEngine.Collision;
-using UnityEngine.UI;
+using SakugaEngine.Game;
+using SakugaEngine.Global;
 
 namespace SakugaEngine.Utils
 {
@@ -13,6 +14,10 @@ namespace SakugaEngine.Utils
         {
             if (body == null) return;
 
+            gameObject.SetActive(GameManager.Instance != null && GameManager.Instance.ShowHitboxes);
+            transform.position = GlobalFunctions.ToScaledVector3(body.FixedPosition);
+            transform.rotation = Quaternion.identity;
+
             UpdateHitboxes();
             UpdatePushbox();
         }
@@ -21,39 +26,39 @@ namespace SakugaEngine.Utils
         {
             for(int j = 0; j < hitboxGraphics.Length; j++)
             {
-                if (body.CurrentHitbox < 0 || j >= body.GetCurrentHitbox().Hitboxes.Length)
+                if (body.CurrentHitbox == null || body.CurrentHitbox.HitboxData == null || body.CurrentHitbox.HitboxData.Hitboxes == null || j >= body.CurrentHitbox.HitboxData.Hitboxes.Length)
                     hitboxGraphics[j].gameObject.SetActive(false);
                 else
                 {
                     hitboxGraphics[j].gameObject.SetActive(body.Hitboxes[j].Active);
 
-                    switch (body.GetCurrentHitbox().Hitboxes[j].HitboxType)
+                    switch (body.CurrentHitbox.HitboxData.Hitboxes[j].HitboxType)
                     {
-                        case Global.HitboxType.HURTBOX:
+                        case HitboxType.HURTBOX:
                             hitboxGraphics[j].sortingOrder = 1;
                             hitboxGraphics[j].color = new Color(0.0f, 1.0f, 0.0f);
                             break;
-                        case Global.HitboxType.HITBOX:
+                        case HitboxType.HITBOX:
                             hitboxGraphics[j].sortingOrder = 2;
                             hitboxGraphics[j].color = new Color(1.0f, 0.0f, 0.0f);
                             break;
-                        case Global.HitboxType.PROJECTILE:
+                        case HitboxType.PROJECTILE:
                             hitboxGraphics[j].sortingOrder = 2;
                             hitboxGraphics[j].color = new Color(1.0f, 0.64f, 0.0f);
                             break;
-                        case Global.HitboxType.PROXIMITY_BLOCK:
+                        case HitboxType.PROXIMITY_BLOCK:
                             hitboxGraphics[j].sortingOrder = 4;
                             hitboxGraphics[j].color = new Color(1.0f, 0.0f, 1.0f);
                             break;
-                        case Global.HitboxType.THROW:
+                        case HitboxType.THROW:
                             hitboxGraphics[j].sortingOrder = 2;
                             hitboxGraphics[j].color = new Color(0.0f, 0.0f, 1.0f);
                             break;
-                        case Global.HitboxType.COUNTER:
+                        case HitboxType.COUNTER:
                             hitboxGraphics[j].sortingOrder = 2;
                             hitboxGraphics[j].color = new Color(0.5f, 0.5f, 0.5f);
                             break;
-                        case Global.HitboxType.DEFLECT:
+                        case HitboxType.DEFLECT:
                             hitboxGraphics[j].sortingOrder = 2;
                             hitboxGraphics[j].color = new Color(1.0f, 0.0f, 0.5f);
                             break;
@@ -62,9 +67,8 @@ namespace SakugaEngine.Utils
                             hitboxGraphics[j].Modulate = new Color(0.5f, 0.5f, 0.5f);
                             break;*/
                     }
-                    //hitboxGraphics[j].material.SetColor("_Tint", hitboxGraphics[j].color);
-                    hitboxGraphics[j].transform.position = Global.ToScaledVector3(body.Hitboxes[j].Center);
-                    hitboxGraphics[j].size = Global.ToScaledVector2(body.Hitboxes[j].Size);
+                    hitboxGraphics[j].transform.position = GlobalFunctions.ToScaledVector3(body.Hitboxes[j].Center);
+                    hitboxGraphics[j].size = GlobalFunctions.ToScaledVector3(body.Hitboxes[j].Size, 1f);
                 }
             }
         }
@@ -75,9 +79,8 @@ namespace SakugaEngine.Utils
             hitboxGraphics[collisionViewer].gameObject.SetActive(body.Pushbox.Active);
             hitboxGraphics[collisionViewer].sortingOrder = 3;
             hitboxGraphics[collisionViewer].color = new Color(1.0f, 1.0f, 0.0f);
-            //hitboxGraphics[collisionViewer].material.SetColor("_Tint", hitboxGraphics[collisionViewer].color);
-            hitboxGraphics[collisionViewer].transform.position = Global.ToScaledVector3(body.Pushbox.Center);
-            hitboxGraphics[collisionViewer].size = Global.ToScaledVector2(body.Pushbox.Size);
+            hitboxGraphics[collisionViewer].transform.position = GlobalFunctions.ToScaledVector3(body.Pushbox.Center);
+            hitboxGraphics[collisionViewer].size = GlobalFunctions.ToScaledVector3(body.Pushbox.Size, 1f);
         }
     }
 }

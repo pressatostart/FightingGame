@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace SakugaEngine.Collision
 {
-    public struct Collider
+    public partial struct Collider
     {
         public Vector2Int Center;
         public Vector2Int Size;
-        public bool Active => Size != Vector2Int.zero;
+        [HideInInspector] public bool Active => Size != Vector2Int.zero;
 
         public bool IsOverlapping(Collider other)
         {

@@ -1,10 +1,13 @@
+using System;
+using UnityEngine;
+
 namespace SakugaEngine.Resources
 {
-    [System.Serializable]
+    [Serializable]
     public class HitboxState
     {
+        public int AtFrame;
         public Global.AnimationStage animationStage;
-        public int Frame;
-        public int HitboxIndex;
+        public HitboxSettings HitboxData;
     }
 }
