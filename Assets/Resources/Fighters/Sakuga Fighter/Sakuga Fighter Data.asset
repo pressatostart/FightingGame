@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e33169f275dbe3146847898eb262d007, type: 3}
+  m_Name: Sakuga Fighter Data
+  m_EditorClassIdentifier: 
+  Profile: {fileID: 11400000, guid: 520e94a7bd152c54890d6f7e11d7c63a, type: 2}
+  States:
+  - {fileID: 11400000, guid: 466ddb7bcb0f8684d8e7ae70a7306119, type: 2}
+  - {fileID: 11400000, guid: e1f3bc51694d2314faf5d6997f83dc9f, type: 2}
+  - {fileID: 11400000, guid: 903091763b22a6a4583e58e23c5ef43f, type: 2}
+  - {fileID: 11400000, guid: 6e0c0fc86d443f344b41aae00e6eb45c, type: 2}
+  - {fileID: 11400000, guid: 92a73b3d70a0b9143b2fe2db0fa53501, type: 2}
+  - {fileID: 11400000, guid: ee63033131dc1e54e95aad2bd44269fb, type: 2}
+  Stances:
+  - {fileID: 11400000, guid: e37dc681f3d92e740ad0ac0df14c0398, type: 2}
+  MaxHealth: 10000
+  MaxSuperGauge: 10000
+  BaseAttack: 100
+  BaseDefense: 100
+  _aiData: {fileID: 11400000, guid: df58594ff5bfa92488f10fe0f28d00d5, type: 2}
+  Intros: []
+  Outros: []
+  VictoryPoses: []
+  DefeatPose: 0

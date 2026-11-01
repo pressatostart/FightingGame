@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Roster
   m_EditorClassIdentifier: 
   elements:
-  - Profile: {fileID: 11400000, guid: 739c5cec390b7ec41962058ad2cfcf96, type: 2}
+  - Profile: {fileID: 11400000, guid: 520e94a7bd152c54890d6f7e11d7c63a, type: 2}
     ColorPalettes:
     - PaletteName: Default
-      Instance: {fileID: 7289189872429710445, guid: dbc3544145857124588acf936171ee49, type: 3}
+      Instance: {fileID: 6928593176049790981, guid: abf053147f2a0374da58628dcc254062, type: 3}

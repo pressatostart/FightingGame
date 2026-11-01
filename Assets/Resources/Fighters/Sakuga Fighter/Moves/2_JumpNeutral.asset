@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b01a3c88e3c70c41977d1929b4f8939, type: 3}
+  m_Name: 2_JumpNeutral
+  m_EditorClassIdentifier: 
+  MoveName: Jump Neutral
+  MoveState: 3
+  SideCheck: 2
+  Inputs: {fileID: 11400000, guid: ad92c4db6adb474418f7cc6b3a2c76a0, type: 2}
+  FrameLimit: -1
+  SuperFlash: 0
+  Priority: 0
+  MoveEnd: 3
+  MoveEndState: 4
+  SuperGaugeRequired: 0
+  HealthRequired: {x: 0, y: 99999}
+  DistanceArea: {x: 0, y: 999999}
+  MinimumHeight: 0
+  IsSequenceFromStates: 
+  IgnoreStates: 
+  CanCancelTo: []
+  VariablesRequirement: []
+  VariablesChange: []
+  SkipCheck: 0
+  Unlockable: 0
+  CanBeOverrided: 1
+  IgnoreSelf: 1
+  PriorityBuffer: 0
+  IgnoreSamePriority: 1
+  AcceptNullStates: 0
+  AcceptMovementStates: 1
+  AcceptCombatStates: 0
+  AcceptBlockingStates: 0
+  AcceptHitReactionStates: 0
+  IgnoreHitstop: 0
+  IgnoreHitstun: 0
+  IgnoreKnockdownHits: 0
+  UseOnGround: 1
+  UseOnAir: 0
