@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ca5d0573643fc24ea798ce7cf268262, type: 3}
-  m_Name: 0_Input-6
+  m_Name: 1_Input_4
   m_EditorClassIdentifier: 
   ValidInputs:
   - Inputs:
-    - Directional: 4
+    - Directional: 2
       Buttons: 0
       DirectionalMode: 1
       ButtonMode: 0
-  AbsoluteDirection: 0
-  InputBuffer: 8
+  AbsoluteDirection: 1
+  InputBuffer: 99999
   DirectionalChargeLimit: 30
   ButtonChargeLimit: 30

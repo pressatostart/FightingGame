@@ -20,41 +20,25 @@ MonoBehaviour:
   TransitionEvents: []
   OnEnterEvents: []
   OnTickEvents:
-  - Conditions: []
-    Actions:
-    - rid: 1434135942299385867
-    - rid: 1434135942299385868
   - Conditions:
-    - rid: 3440271427415834727
+    - rid: 1434135942299385872
     Actions:
-    - rid: 1434135942299385869
+    - rid: 1434135942299385873
   OnExitEvents: []
   OnHitConfirmEvents: []
   OnHitReactionEvents: []
   references:
     version: 2
     RefIds:
-    - rid: 1434135942299385867
-      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        Velocity: 0
-        UseInertia: 0
-        UseInput: 0
-    - rid: 1434135942299385868
-      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        Velocity: 0
-        UseInertia: 0
-        UseInput: 0
-    - rid: 1434135942299385869
-      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        StateIndex: 0
-        StateName: 0_Idle
-        Reset: 1
-    - rid: 3440271427415834727
+    - rid: 1434135942299385872
       type: {class: AtFrameCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
         Frame: 4
         Modulo: 0
         Not: 0
+    - rid: 1434135942299385873
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 0
+        StateName: 0_Idle
+        Reset: 1

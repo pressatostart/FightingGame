@@ -36,7 +36,7 @@ MonoBehaviour:
   IgnoreSelf: 1
   PriorityBuffer: 1
   IgnoreSamePriority: 1
-  AcceptNullStates: 1
+  AcceptNullStates: 0
   AcceptMovementStates: 1
   AcceptCombatStates: 0
   AcceptBlockingStates: 0

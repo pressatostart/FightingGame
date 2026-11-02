@@ -20,10 +20,6 @@ MonoBehaviour:
   TransitionEvents: []
   OnEnterEvents: []
   OnTickEvents:
-  - Conditions: []
-    Actions:
-    - rid: 1434135942299385865
-    - rid: 1434135942299385866
   - Conditions:
     - rid: 3440271427415834729
     Actions:
@@ -34,18 +30,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1434135942299385865
-      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        Velocity: 0
-        UseInertia: 0
-        UseInput: 0
-    - rid: 1434135942299385866
-      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        Velocity: 0
-        UseInertia: 0
-        UseInput: 0
     - rid: 3440271427415834729
       type: {class: AtFrameCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
