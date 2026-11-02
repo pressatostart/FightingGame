@@ -34,11 +34,11 @@ MonoBehaviour:
   Unlockable: 0
   CanBeOverrided: 1
   IgnoreSelf: 1
-  PriorityBuffer: 1
+  PriorityBuffer: 0
   IgnoreSamePriority: 1
   AcceptNullStates: 0
   AcceptMovementStates: 1
-  AcceptCombatStates: 0
+  AcceptCombatStates: 1
   AcceptBlockingStates: 0
   AcceptHitReactionStates: 0
   IgnoreHitstop: 0

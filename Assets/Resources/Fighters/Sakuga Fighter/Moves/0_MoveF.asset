@@ -34,7 +34,7 @@ MonoBehaviour:
   Unlockable: 0
   CanBeOverrided: 1
   IgnoreSelf: 1
-  PriorityBuffer: 0
+  PriorityBuffer: 1
   IgnoreSamePriority: 1
   AcceptNullStates: 0
   AcceptMovementStates: 1
