@@ -27,13 +27,19 @@ MonoBehaviour:
   - Conditions:
     - rid: 3440271427415834657
     Actions:
-    - rid: 3440271427415834665
+    - rid: 1434135942027804674
   OnExitEvents: []
   OnHitConfirmEvents: []
   OnHitReactionEvents: []
   references:
     version: 2
     RefIds:
+    - rid: 1434135942027804674
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 6
+        StateName: 6_Fall
+        Reset: 1
     - rid: 3440271427415834657
       type: {class: AtFrameRangeCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
@@ -52,9 +58,3 @@ MonoBehaviour:
         Velocity: 80000
         UseInertia: 0
         UseInput: 0
-    - rid: 3440271427415834665
-      type: {class: AddGravityAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
-      data:
-        SetValue: 1
-        UseDefault: 1
-        Force: 0

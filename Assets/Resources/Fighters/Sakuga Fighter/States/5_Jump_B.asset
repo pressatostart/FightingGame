@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e1def9eae527dd4994a3e296dcb49f3, type: 3}
+  m_Name: 5_Jump_B
+  m_EditorClassIdentifier: 
+  StateName: Jump Backwards
+  AnimationData: {fileID: 11400000, guid: 329780b68c6d0d44ab7ac64da465f03d, type: 2}
+  BaseStance: 0
+  Type: 1
+  AIFlags: 0
+  TransitionEvents: []
+  OnEnterEvents: []
+  OnTickEvents:
+  - Conditions:
+    - rid: 3440271427415834692
+    Actions:
+    - rid: 3440271427415834722
+    - rid: 3440271427415834720
+  - Conditions:
+    - rid: 3440271427415834695
+    Actions:
+    - rid: 3440271427415834725
+  OnExitEvents: []
+  OnHitConfirmEvents: []
+  OnHitReactionEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 3440271427415834692
+      type: {class: AtFrameCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Frame: 4
+        Modulo: 0
+        Not: 0
+    - rid: 3440271427415834695
+      type: {class: AtFrameRangeCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        MinFrame: 5
+        MaxFrame: 43
+        Not: 0
+    - rid: 3440271427415834720
+      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 80000
+        UseInertia: 0
+        UseInput: 0
+    - rid: 3440271427415834722
+      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: -16000
+        UseInertia: 0
+        UseInput: 0
+    - rid: 3440271427415834725
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 6
+        StateName: 6_Fall
+        Reset: 1

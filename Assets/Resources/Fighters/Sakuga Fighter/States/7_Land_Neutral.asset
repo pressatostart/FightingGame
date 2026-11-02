@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e1def9eae527dd4994a3e296dcb49f3, type: 3}
+  m_Name: 7_Land_Neutral
+  m_EditorClassIdentifier: 
+  StateName: Neutral Land
+  AnimationData: {fileID: 11400000, guid: 329780b68c6d0d44ab7ac64da465f03d, type: 2}
+  BaseStance: 0
+  Type: 1
+  AIFlags: 0
+  TransitionEvents: []
+  OnEnterEvents: []
+  OnTickEvents:
+  - Conditions: []
+    Actions:
+    - rid: 1434135942299385867
+    - rid: 1434135942299385868
+  - Conditions:
+    - rid: 3440271427415834727
+    Actions:
+    - rid: 1434135942299385869
+  OnExitEvents: []
+  OnHitConfirmEvents: []
+  OnHitReactionEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1434135942299385867
+      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0
+    - rid: 1434135942299385868
+      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0
+    - rid: 1434135942299385869
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 0
+        StateName: 0_Idle
+        Reset: 1
+    - rid: 3440271427415834727
+      type: {class: AtFrameCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Frame: 4
+        Modulo: 0
+        Not: 0

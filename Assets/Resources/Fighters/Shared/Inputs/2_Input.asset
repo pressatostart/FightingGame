@@ -18,6 +18,14 @@ MonoBehaviour:
       Buttons: 0
       DirectionalMode: 0
       ButtonMode: 0
+    - Directional: 2
+      Buttons: 0
+      DirectionalMode: 4
+      ButtonMode: 0
+    - Directional: 4
+      Buttons: 0
+      DirectionalMode: 4
+      ButtonMode: 0
   AbsoluteDirection: 0
   InputBuffer: 8
   DirectionalChargeLimit: 30

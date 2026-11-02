@@ -18,9 +18,9 @@ MonoBehaviour:
   Inputs: {fileID: 11400000, guid: ad92c4db6adb474418f7cc6b3a2c76a0, type: 2}
   FrameLimit: -1
   SuperFlash: 0
-  Priority: 0
+  Priority: 1
   MoveEnd: 3
-  MoveEndState: 4
+  MoveEndState: 6
   SuperGaugeRequired: 0
   HealthRequired: {x: 0, y: 99999}
   DistanceArea: {x: 0, y: 999999}
@@ -34,7 +34,7 @@ MonoBehaviour:
   Unlockable: 0
   CanBeOverrided: 1
   IgnoreSelf: 1
-  PriorityBuffer: 0
+  PriorityBuffer: 1
   IgnoreSamePriority: 1
   AcceptNullStates: 0
   AcceptMovementStates: 1

@@ -18,8 +18,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e1f3bc51694d2314faf5d6997f83dc9f, type: 2}
   - {fileID: 11400000, guid: 903091763b22a6a4583e58e23c5ef43f, type: 2}
   - {fileID: 11400000, guid: 6e0c0fc86d443f344b41aae00e6eb45c, type: 2}
+  - {fileID: 11400000, guid: 44ceb407bc21a014d8d55d4fdc848376, type: 2}
+  - {fileID: 11400000, guid: 5b5a1881fc11983409f6fe58be658c41, type: 2}
   - {fileID: 11400000, guid: 92a73b3d70a0b9143b2fe2db0fa53501, type: 2}
   - {fileID: 11400000, guid: ee63033131dc1e54e95aad2bd44269fb, type: 2}
+  - {fileID: 11400000, guid: ef918bb6e118b274e9cfe2017d3f1d1a, type: 2}
+  - {fileID: 11400000, guid: 9542a21fc417ae243a8a353059dd8d07, type: 2}
   Stances:
   - {fileID: 11400000, guid: e37dc681f3d92e740ad0ac0df14c0398, type: 2}
   MaxHealth: 10000

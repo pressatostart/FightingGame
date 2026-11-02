@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e1def9eae527dd4994a3e296dcb49f3, type: 3}
-  m_Name: 4_Fall_Neutral
+  m_Name: 9_Land_B
   m_EditorClassIdentifier: 
-  StateName: Neutral Fall
+  StateName: Land Backwards
   AnimationData: {fileID: 11400000, guid: 329780b68c6d0d44ab7ac64da465f03d, type: 2}
-  BaseStance: 2
+  BaseStance: 0
   Type: 1
   AIFlags: 0
   TransitionEvents: []
@@ -22,30 +22,39 @@ MonoBehaviour:
   OnTickEvents:
   - Conditions: []
     Actions:
-    - rid: 3440271427415834667
+    - rid: 1434135942299385870
+    - rid: 1434135942299385871
   - Conditions:
-    - rid: 3440271427415834668
+    - rid: 3440271427415834731
     Actions:
-    - rid: 3440271427415834669
+    - rid: 3440271427415834732
   OnExitEvents: []
   OnHitConfirmEvents: []
   OnHitReactionEvents: []
   references:
     version: 2
     RefIds:
-    - rid: 3440271427415834667
-      type: {class: AddGravityAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+    - rid: 1434135942299385870
+      type: {class: MoveXAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
-        SetValue: 1
-        UseDefault: 1
-        Force: 0
-    - rid: 3440271427415834668
-      type: {class: OnGroundCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0
+    - rid: 1434135942299385871
+      type: {class: MoveYAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
+        Velocity: 0
+        UseInertia: 0
+        UseInput: 0
+    - rid: 3440271427415834731
+      type: {class: AtFrameCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Frame: 4
+        Modulo: 0
         Not: 0
-    - rid: 3440271427415834669
+    - rid: 3440271427415834732
       type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:
-        StateIndex: 5
-        StateName: 5_Land_Neutral
+        StateIndex: 0
+        StateName: 0_Idle
         Reset: 1

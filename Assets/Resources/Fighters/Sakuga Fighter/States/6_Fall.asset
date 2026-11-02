@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e1def9eae527dd4994a3e296dcb49f3, type: 3}
+  m_Name: 6_Fall
+  m_EditorClassIdentifier: 
+  StateName: Fall
+  AnimationData: {fileID: 11400000, guid: 329780b68c6d0d44ab7ac64da465f03d, type: 2}
+  BaseStance: 2
+  Type: 1
+  AIFlags: 0
+  TransitionEvents: []
+  OnEnterEvents: []
+  OnTickEvents:
+  - Conditions: []
+    Actions:
+    - rid: 1434135942190333953
+  - Conditions:
+    - rid: 1434135942299385856
+    - rid: 1434135942299385858
+    Actions:
+    - rid: 1434135942299385857
+  - Conditions:
+    - rid: 1434135942299385859
+    - rid: 1434135942299385860
+    Actions:
+    - rid: 1434135942299385861
+  - Conditions:
+    - rid: 1434135942299385862
+    - rid: 1434135942299385863
+    Actions:
+    - rid: 1434135942299385864
+  OnExitEvents: []
+  OnHitConfirmEvents: []
+  OnHitReactionEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 1434135942190333953
+      type: {class: AddGravityAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        SetValue: 1
+        UseDefault: 1
+        Force: 0
+    - rid: 1434135942299385856
+      type: {class: OnGroundCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Not: 0
+    - rid: 1434135942299385857
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 7
+        StateName: 7_Land_Neutral
+        Reset: 1
+    - rid: 1434135942299385858
+      type: {class: CheckXVelocityCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Absolute: 0
+        Value: 0
+        CompareMode: 0
+    - rid: 1434135942299385859
+      type: {class: OnGroundCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Not: 0
+    - rid: 1434135942299385860
+      type: {class: CheckXVelocityCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Absolute: 0
+        Value: 0
+        CompareMode: 2
+    - rid: 1434135942299385861
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 8
+        StateName: 8_Land_F
+        Reset: 1
+    - rid: 1434135942299385862
+      type: {class: OnGroundCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Not: 0
+    - rid: 1434135942299385863
+      type: {class: CheckXVelocityCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Absolute: 0
+        Value: 0
+        CompareMode: 4
+    - rid: 1434135942299385864
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 9
+        StateName: 9_Land_B
+        Reset: 1
