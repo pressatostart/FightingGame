@@ -18,7 +18,12 @@ MonoBehaviour:
   Type: 1
   AIFlags: 0
   TransitionEvents: []
-  OnEnterEvents: []
+  OnEnterEvents:
+  - Conditions: []
+    Actions:
+    - rid: 1434135964554362880
+    - rid: 1434135964554362881
+    - rid: 1434135964554362882
   OnTickEvents:
   - Conditions:
     - rid: 1434135942299385872
@@ -42,3 +47,30 @@ MonoBehaviour:
         StateIndex: 0
         StateName: 0_Idle
         Reset: 1
+    - rid: 1434135964554362880
+      type: {class: SetCustomVariableAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        ByIndex: 0
+        ByName: 
+        ChangeMode: 0
+        NewValue: 0
+        IsRandom: 0
+        RandomRange: 0
+    - rid: 1434135964554362881
+      type: {class: SetCustomVariableAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        ByIndex: 1
+        ByName: 
+        ChangeMode: 0
+        NewValue: 0
+        IsRandom: 0
+        RandomRange: 0
+    - rid: 1434135964554362882
+      type: {class: SetCustomVariableAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        ByIndex: 2
+        ByName: 
+        ChangeMode: 0
+        NewValue: 0
+        IsRandom: 0
+        RandomRange: 0

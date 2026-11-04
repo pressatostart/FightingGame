@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b01a3c88e3c70c41977d1929b4f8939, type: 3}
   m_Name: 2_JumpNeutral
   m_EditorClassIdentifier: 
-  MoveName: Jump Neutral
+  MoveName: Neutral Jump
   MoveState: 3
   SideCheck: 2
   Inputs: {fileID: 11400000, guid: ad92c4db6adb474418f7cc6b3a2c76a0, type: 2}
   FrameLimit: -1
   SuperFlash: 0
   Priority: 1
-  MoveEnd: 3
-  MoveEndState: 6
+  MoveEnd: 0
+  MoveEndState: -1
   SuperGaugeRequired: 0
   HealthRequired: {x: 0, y: 99999}
   DistanceArea: {x: 0, y: 999999}

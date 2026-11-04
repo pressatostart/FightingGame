@@ -17,7 +17,11 @@ MonoBehaviour:
   BaseStance: 0
   Type: 1
   AIFlags: 0
-  TransitionEvents: []
+  TransitionEvents:
+  - Conditions:
+    - rid: 1434135991878418432
+    Actions:
+    - rid: 1434135991878418433
   OnEnterEvents: []
   OnTickEvents:
   - Conditions:
@@ -40,6 +44,16 @@ MonoBehaviour:
         SetValue: 1
         UseDefault: 1
         Force: 0
+    - rid: 1434135991878418432
+      type: {class: StateEndedCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        Not: 0
+    - rid: 1434135991878418433
+      type: {class: PlayStateAction, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
+      data:
+        StateIndex: 6
+        StateName: 6_Fall
+        Reset: 1
     - rid: 3440271427415834657
       type: {class: AtFrameRangeCondition, ns: SakugaEngine.Resources, asm: Assembly-CSharp}
       data:

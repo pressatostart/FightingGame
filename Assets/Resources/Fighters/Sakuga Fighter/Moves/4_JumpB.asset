@@ -19,8 +19,8 @@ MonoBehaviour:
   FrameLimit: -1
   SuperFlash: 0
   Priority: 1
-  MoveEnd: 3
-  MoveEndState: 6
+  MoveEnd: 0
+  MoveEndState: -1
   SuperGaugeRequired: 0
   HealthRequired: {x: 0, y: 99999}
   DistanceArea: {x: 0, y: 999999}
